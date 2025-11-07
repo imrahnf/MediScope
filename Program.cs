@@ -1,7 +1,15 @@
+using MediScope.Models;
+using MediScope.Data;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Connect EF
+builder.Services.AddDbContext<MediScopeContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 
@@ -23,5 +31,17 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<MediScopeContext>();
+    
+    // apply migrations
+    context.Database.Migrate();
+    
+    // seed data
+    SeedData.Initialize(context);
+}
 
 app.Run();
