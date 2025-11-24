@@ -1,112 +1,138 @@
+using MediScope.Identity;
 using MediScope.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace MediScope.Data;
 
 public static class SeedData
 {
-    public static void Initialize(MediScopeContext context)
+    public static async Task Initialize(IServiceProvider _serviceProvider, MediScopeContext context)
     {
-        // ######### (seeded data generated with ChatGPT) #########
+        var userManager = _serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+        var roleManager = _serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-        // admins
-        var administrator1 = context.Administrators.FirstOrDefault(a => a.Name == "omrahn");
-        if (administrator1 == null)
+        // ######### Ensure Roles #########
+        string[] roles = { "Admin", "Doctor", "Patient" };
+        foreach (var role in roles)
         {
-            administrator1 = new Administrator { Name = "omrahn", Email = "omrahn@gmail.com" };
-            context.Administrators.Add(administrator1);
+            if (!await roleManager.RoleExistsAsync(role))
+                await roleManager.CreateAsync(new IdentityRole(role));
         }
 
-        var administrator2 = context.Administrators.FirstOrDefault(a => a.Name == "maryam");
-        if (administrator2 == null)
+        // ######### Seed Admin #########
+        var adminUser = await userManager.FindByNameAsync("admin");
+        if (adminUser == null)
         {
-            administrator2 = new Administrator { Name = "maryam", Email = "maryam@gmail.com" };
-            context.Administrators.Add(administrator2);
+            var newAdmin = new ApplicationUser { UserName = "admin", Email = "admin@mediscope.com" };
+            var result = await userManager.CreateAsync(newAdmin, "Admin@123!");
+            if (!result.Succeeded)
+                throw new Exception("Failed to create admin user: " + string.Join(", ", result.Errors.Select(e => e.Description)));
+
+            adminUser = await userManager.FindByNameAsync("admin");
+
+            context.Administrators.Add(new Administrator
+            {
+                UserId = adminUser.Id,
+                Name = "John Doe"
+            });
+            await context.SaveChangesAsync();
+            await userManager.AddToRoleAsync(adminUser, "Admin");
         }
 
-        context.SaveChanges();
-        
-        // initial doctor data 
-        var doctor1 = context.Doctors.FirstOrDefault(d => d.Name == "Dr. Sarah Patel");
-        if (doctor1 == null)
+        // ######### Seed Doctors #########
+        var doctorsData = new[]
         {
-            doctor1 = new Doctor { Name = "Dr. Sarah Patel", Specialty = "Cardiology" };
-            context.Doctors.Add(doctor1);
+            new { Username = "doctor1", Name = "Dr. Sarah Johnson", Specialty = "Family Medicine" },
+            new { Username = "doctor2", Name = "Dr. Mark Patel", Specialty = "Cardiology" }
+        };
+
+        foreach (var d in doctorsData)
+        {
+            var docUser = await userManager.FindByNameAsync(d.Username);
+            if (docUser == null)
+            {
+                var newDocUser = new ApplicationUser { UserName = d.Username, Email = d.Username + "@mediscope.com" };
+                var result = await userManager.CreateAsync(newDocUser, "Doc@123!");
+                if (!result.Succeeded)
+                    throw new Exception("Failed to create doctor user: " + string.Join(", ", result.Errors.Select(e => e.Description)));
+
+                docUser = await userManager.FindByNameAsync(d.Username);
+
+                context.Doctors.Add(new Doctor
+                {
+                    UserId = docUser.Id,
+                    Name = d.Name,
+                    Specialty = d.Specialty
+                });
+                await context.SaveChangesAsync();
+
+                await userManager.AddToRoleAsync(docUser, "Doctor");
+            }
         }
 
-        var doctor2 = context.Doctors.FirstOrDefault(d => d.Name == "Dr. James Wong");
-        if (doctor2 == null)
+        // ######### Seed Patients #########
+        var patientsData = new[]
         {
-            doctor2 = new Doctor { Name = "Dr. James Wong", Specialty = "Neurology" };
-            context.Doctors.Add(doctor2);
+            new { Username = "patient1", Name = "John Doe", Age = 30, Gender = "Male", Email = "john@example.com" },
+            new { Username = "patient2", Name = "Emily Chen", Age = 24, Gender = "Female", Email = "emily@example.com" }
+        };
+
+        foreach (var p in patientsData)
+        {
+            var patUser = await userManager.FindByNameAsync(p.Username);
+            if (patUser == null)
+            {
+                var newPatUser = new ApplicationUser { UserName = p.Username, Email = p.Username + "@mediscope.com" };
+                var result = await userManager.CreateAsync(newPatUser, "Pat@123!");
+                if (!result.Succeeded)
+                    throw new Exception("Failed to create patient user: " + string.Join(", ", result.Errors.Select(e => e.Description)));
+
+                patUser = await userManager.FindByNameAsync(p.Username);
+
+                context.Patients.Add(new Patient
+                {
+                    UserId = patUser.Id,
+                    Name = p.Name,
+                    Age = p.Age,
+                    Gender = p.Gender,
+                    Email = p.Email
+                });
+                await context.SaveChangesAsync();
+
+                await userManager.AddToRoleAsync(patUser, "Patient");
+            }
         }
 
-        context.SaveChanges();
+        // ######### Seed Feedback #########
+        var doctorProfiles = context.Doctors.ToList();
+        var patientProfiles = context.Patients.ToList();
 
-        // seed initial patient data
-        var patient1 = context.Patients.FirstOrDefault(p => p.Name == "John Doe");
-        if (patient1 == null)
+        if (!context.Feedbacks.Any() && doctorProfiles.Count >= 2 && patientProfiles.Count >= 2)
         {
-            patient1 = new Patient { Name = "John Doe", Age = 34, Gender = "Male", Email = "john@gmail.com" };
-            context.Patients.Add(patient1);
+            context.Feedbacks.AddRange(
+                new Feedback
+                {
+                    DoctorId = doctorProfiles[0].Id,
+                    PatientId = patientProfiles[0].Id,
+                    Rating = 5,
+                    Message = "Great service!"
+                },
+                new Feedback
+                {
+                    DoctorId = doctorProfiles[1].Id,
+                    PatientId = patientProfiles[1].Id,
+                    Rating = 1,
+                    Message = "Rude staff."
+                }
+            );
         }
+        await context.SaveChangesAsync();
 
-        var patient2 = context.Patients.FirstOrDefault(p => p.Name == "Jane Smith");
-        if (patient2 == null)
-        {
-            patient2 = new Patient { Name = "Jane Smith", Age = 28, Gender = "Female", Email = "jane@gmail.com" };
-            context.Patients.Add(patient2);
-        }
-
-        context.SaveChanges();
-
-        // users
-        if (!context.Users.Any(u => u.Username == "admin"))
-            context.Users.Add(new User { Username = "admin", Password = "admin", Role = "Admin" });
-
-        if (!context.Users.Any(u => u.Username == "doc1"))
-            context.Users.Add(new User { Username = "doc1", Password = "123", Role = "Doctor", DoctorId = doctor1.Id });
-
-        if (!context.Users.Any(u => u.Username == "doc2"))
-            context.Users.Add(new User { Username = "doc2", Password = "123", Role = "Doctor", DoctorId = doctor2.Id });
-
-        if (!context.Users.Any(u => u.Username == "pat1"))
-            context.Users.Add(new User { Username = "pat1", Password = "123", Role = "Patient", PatientId = patient1.Id });
-
-        if (!context.Users.Any(u => u.Username == "pat2"))
-            context.Users.Add(new User { Username = "pat2", Password = "123", Role = "Patient", PatientId = patient2.Id });
-
-        context.SaveChanges();
-
-        // apopintmnts
-        if (!context.Appointments.Any(a => a.PatientId == patient1.Id && a.DoctorId == doctor1.Id))
-            context.Appointments.Add(new Appointment { PatientId = patient1.Id, DoctorId = doctor1.Id, Date = DateTime.Now.AddDays(1), Status = "Scheduled" });
-
-        if (!context.Appointments.Any(a => a.PatientId == patient2.Id && a.DoctorId == doctor2.Id))
-            context.Appointments.Add(new Appointment { PatientId = patient2.Id, DoctorId = doctor2.Id, Date = DateTime.Now.AddDays(2), Status = "Scheduled" });
-
-        context.SaveChanges();
-
-        // feedback
-        if (!context.Feedbacks.Any(f => f.PatientId == patient1.Id && f.DoctorId == doctor1.Id))
-            context.Feedbacks.Add(new Feedback { PatientId = patient1.Id, DoctorId = doctor1.Id, Message = "Great service!", Rating = 5 });
-
-        if (!context.Feedbacks.Any(f => f.PatientId == patient2.Id && f.DoctorId == doctor2.Id))
-            context.Feedbacks.Add(new Feedback { PatientId = patient2.Id, DoctorId = doctor2.Id, Message = "Friendly staff.", Rating = 4 });
-
-        context.SaveChanges();
-        
-        // no initial data required, table exists for future seeding
-        if (!context.TestResults.Any())
-        {
-            context.SaveChanges();
-        }
-        
-        // no initial data required, table exists for future metrics/charts
+        // ######### Seed Analytics #########
         if (!context.AnalyticsRecords.Any())
         {
-            
-            var analyticsSeed = new List<AnalyticsRecord>
+            context.AnalyticsRecords.AddRange(new List<AnalyticsRecord>
             {
                 new AnalyticsRecord { MetricName = "AverageWaitTime", Value = 12.5, RecordedAt = DateTime.Now.AddDays(-10) },
                 new AnalyticsRecord { MetricName = "AverageWaitTime", Value = 10.2, RecordedAt = DateTime.Now.AddDays(-9) },
@@ -118,11 +144,38 @@ public static class SeedData
                 new AnalyticsRecord { MetricName = "CancelledAppointments", Value = 2, RecordedAt = DateTime.Now.AddDays(-3) },
                 new AnalyticsRecord { MetricName = "CancelledAppointments", Value = 1, RecordedAt = DateTime.Now.AddDays(-2) },
                 new AnalyticsRecord { MetricName = "NewPatients", Value = 5, RecordedAt = DateTime.Now.AddDays(-1) }
-            };
+            });
+            await context.SaveChangesAsync();
+        }
 
-            context.AnalyticsRecords.AddRange(analyticsSeed);
-            context.SaveChanges();
-            
+        // ######### (Seed Appointments) #########
+        if (!context.Appointments.Any())
+        {
+            context.Appointments.AddRange(
+                new Appointment
+                {
+                    DoctorId = doctorProfiles[0].Id,
+                    PatientId = patientProfiles[0].Id,
+                    Date = DateTime.Now.AddDays(1),
+                    Status = "Scheduled"
+                },
+                new Appointment
+                {
+                    DoctorId = doctorProfiles[1].Id,
+                    PatientId = patientProfiles[1].Id,
+                    Date = DateTime.Now.AddDays(2),
+                    Status = "Scheduled"
+                }
+            );
+        }
+
+        await context.SaveChangesAsync();
+
+        
+        // ######### Ensure TestResults table exists #########
+        if (!context.TestResults.Any())
+        {
+            await context.SaveChangesAsync();
         }
     }
 }
