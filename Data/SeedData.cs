@@ -12,6 +12,14 @@ public static class SeedData
         var userManager = _serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
         var roleManager = _serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
+        /*
+         * admin - Admin@123!
+         * doctor1 - Doc@123!
+         * doctor2 - Doc@123!
+         * patient1 - Pat@123!
+         * patient2 - Pat@123!
+         */
+        
         // ######### Ensure Roles #########
         string[] roles = { "Admin", "Doctor", "Patient" };
         foreach (var role in roles)
