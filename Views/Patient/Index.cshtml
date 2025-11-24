@@ -3,10 +3,17 @@
 }
 
 <head>
-    <title>title</title>
+    <title>Patient Home Page</title>
 </head>
 <body>
 <div>
-    <h1>Patient Index</h1>
+    <h1>Patient Home Page</h1>
+    <h3>
+        Want to book an appointment?
+        <a asp-controller="Appointment" asp-action="Book">Book Appointment</a>
+    </h3>
 </div>
+<footer>
+    <a asp-controller="Account" asp-action="Logout">Logout</a>
+</footer>
 </body>

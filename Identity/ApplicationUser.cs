@@ -1,6 +1,7 @@
+using Microsoft.AspNetCore.Identity;
 namespace MediScope.Identity;
 
-public class ApplicationUser
+public class ApplicationUser : IdentityUser
 {
     
 }
