@@ -1,11 +1,18 @@
 using MediScope.Models;
 using MediScope.Data;
+using MediScope.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Inject repos
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<AppointmentRepository>();
+builder.Services.AddScoped<PatientRepository>();
+// .. add any other repos here
 
 // Connect EF
 builder.Services.AddDbContext<MediScopeContext>(options =>
