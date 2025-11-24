@@ -10,9 +10,4 @@ public class AuthenticationService
     {
         _context = dbContext;
     }
-
-    public User? ValidateUser(string username, string password)
-    {
-        return _context.Users.FirstOrDefault(p => p.Username == username && p.Password == password);
-    }
 }

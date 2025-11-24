@@ -1,7 +1,9 @@
 using MediScope.Models;
 using MediScope.Data;
+using MediScope.Identity;
 using MediScope.Repositories;
 using MediScope.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,6 +33,17 @@ builder.Services.AddSession(options =>
 builder.Services.AddDbContext<MediScopeContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => { options.Lockout.AllowedForNewUsers = false; })
+    .AddEntityFrameworkStores<MediScopeContext>()
+    .AddDefaultTokenProviders();
+
+
+builder.Services.ConfigureApplicationCookie(options =>
+    {
+        options.LoginPath = "/Account/Login";
+        options.AccessDeniedPath = "/Account/AccessDenied";
+    });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -46,7 +59,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+    
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
@@ -62,7 +76,7 @@ using (var scope = app.Services.CreateScope())
     context.Database.Migrate();
     
     // seed data
-    SeedData.Initialize(context);
+    await SeedData.Initialize(services, context);
 }
 
 app.Run();

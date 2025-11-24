@@ -1,4 +1,7 @@
+using MediScope.Identity;
+
 namespace MediScope.Models;
+
 
 public class Doctor
 {
@@ -6,7 +9,7 @@ public class Doctor
     public string Name { get; set; } = "";
     public string Specialty { get; set; } = "";
 
-    // Navigation
-    public List<Appointment>? Appointments { get; set; }
-    public List<Feedback>? Feedbacks { get; set; }
+    // FK to Identity
+    public string? UserId { get; set; }
+    public ApplicationUser? User { get; set; }
 }

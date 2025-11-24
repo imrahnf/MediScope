@@ -1,4 +1,6 @@
+using MediScope.Identity;
 using MediScope.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MediScope.Controllers;
@@ -6,40 +8,41 @@ namespace MediScope.Controllers;
 
 public class AccountController : Controller
 {
-    private readonly AuthenticationService _authenticationService;
-    public AccountController(AuthenticationService authenticationService)
+    private readonly SignInManager<ApplicationUser> _signInManager;
+    private readonly UserManager<ApplicationUser> _userManager;
+    
+    public AccountController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager)
     {
-        _authenticationService = authenticationService;
+        _signInManager = signInManager;
+        _userManager = userManager;
     }
 
     // Sign In
     [HttpPost]
-    public IActionResult Login(string username, string password)
+    public async Task<IActionResult> Login(string username, string password)
     {
-        var user = _authenticationService.ValidateUser(username, password);
-        if (user == null)
+        var result = await _signInManager.PasswordSignInAsync(username, password, false, false);
+
+        if (!result.Succeeded)
         {
             ViewBag.Error = "Invalid username or password";
             return View();
         }
         
-        // Session varaibles
-        HttpContext.Session.SetInt32("UserId", user.Id);
-        HttpContext.Session.SetString("Role", user.Role);        
+        var user = await _userManager.FindByNameAsync(username);
+        var roles = await _userManager.GetRolesAsync(user);
         
-        // redirect based on role
-        return user.Role switch
+        if (roles.Contains("Patient"))
         {
-            // TODO: add routes for other roles (admin, doctor)
-            "Patient" => RedirectToAction("Index", "Patient"),
-            _ => RedirectToAction("Login", "Account")
-        };
+            return RedirectToAction("Index", "Patient");
+        }
+        return RedirectToAction("Login", "Account");
     }
     
     // Logout
-    public IActionResult Logout()
+    public async Task<IActionResult> Logout()
     {
-        HttpContext.Session.Clear();
+        await _signInManager.SignOutAsync();
         return RedirectToAction("Login");
     }
     
