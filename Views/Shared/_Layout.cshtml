@@ -1,57 +1,110 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>@ViewData["Title"] - MediScope</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.3rem;
+        }
+        .page-header {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        footer {
+            margin-top: 60px;
+            padding: 20px 0;
+            color: #777;
+            border-top: 1px solid #ddd;
+            text-align: center;
+        }
+    </style>
 </head>
+
 <body>
-<nav class="navbar navbar-expand-lg navbar-light bg-light mb-3">
-    <div class="container">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
         <a class="navbar-brand" asp-controller="Home" asp-action="Index">MediScope</a>
-        <div class="collapse navbar-collapse">
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarNav" aria-controls="navbarNav"
+                aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+
             <ul class="navbar-nav me-auto">
-                @if (User.Identity.IsAuthenticated)
+
+                @if (User.IsInRole("Patient"))
                 {
-                    if (User.IsInRole("Admin"))
-                    {
-                        <li class="nav-item"><a class="nav-link" asp-controller="Admin" asp-action="Index">Admin</a></li>
-                    }
-                    if (User.IsInRole("Doctor"))
-                    {
-                        <li class="nav-item"><a class="nav-link" asp-controller="Doctor" asp-action="Index">Doctor</a></li>
-                    }
-                    if (User.IsInRole("Patient"))
-                    {
-                        <li class="nav-item"><a class="nav-link" asp-controller="Patient" asp-action="Index">Patient</a></li>
-                    }
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Patient" asp-action="Index">Dashboard</a>
+                    </li>
                 }
+
+                @if (User.IsInRole("Doctor"))
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Doctor" asp-action="Index">My Appointments</a>
+                    </li>
+                }
+
+                @if (User.IsInRole("Administrator"))
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="Dashboard">Admin Dashboard</a>
+                    </li>
+                }
+
             </ul>
 
-            <ul class="navbar-nav">
+            <ul class="navbar-nav ms-auto">
+
                 @if (User.Identity.IsAuthenticated)
                 {
-                    <li class="nav-item"><a class="nav-link" asp-controller="Account" asp-action="Logout">Logout</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white small">Hello, @User.Identity.Name</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Account" asp-action="Logout">Logout</a>
+                    </li>
                 }
                 else
                 {
-                    <li class="nav-item"><a class="nav-link" asp-controller="Account" asp-action="Login">Login</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Account" asp-action="Login">Login</a>
+                    </li>
                 }
+
             </ul>
+
         </div>
     </div>
 </nav>
 
-<div class="container">
+<div class="container mt-4">
     <main role="main" class="pb-3">
         @RenderBody()
     </main>
 </div>
 
+<footer>
+    <small>MediScope © @DateTime.Now.Year</small>
+</footer>
+
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>
