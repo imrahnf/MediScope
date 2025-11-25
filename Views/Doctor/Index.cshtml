@@ -1,12 +1,42 @@
+@model IEnumerable<MediScope.Models.Appointment>
 @{
     Layout = "_Layout";
 }
 
-<head>
-    <title>title</title>
-</head>
-<body>
-<div>
-    <h1>Doctor Index</h1>
-</div>
-</body>
+<h2 class="fw-bold mb-4">Today's Appointments</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">You have no appointments today.</div>
+}
+else
+{
+    <table class="table table-striped table-hover">
+        <thead>
+        <tr>
+            <th>Patient</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var appt in Model)
+        {
+            <tr>
+                <td>@appt.Patient.Name</td>
+                <td>@appt.Date</td>
+                <td><span class="badge bg-primary">@appt.Status</span></td>
+                <td>
+                    <a asp-action="UploadTestResult"
+                       asp-route-appointmentId="@appt.Id"
+                       asp-route-patientId="@appt.PatientId"
+                       class="btn btn-sm btn-success">
+                        Upload Test Result
+                    </a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
