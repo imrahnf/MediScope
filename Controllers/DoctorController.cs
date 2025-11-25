@@ -6,6 +6,7 @@ public class DoctorController : Controller
 {
     // GET
     public IActionResult Index()
+    
     {
         return View();
     }

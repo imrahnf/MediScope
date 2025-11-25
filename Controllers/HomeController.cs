@@ -5,6 +5,7 @@ using MediScope.Models;
 namespace MediScope.Controllers;
 
 public class HomeController : Controller
+
 {
     public HomeController()
     {
