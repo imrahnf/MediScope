@@ -1,15 +1,29 @@
+@model IEnumerable<MediScope.Models.Doctor>
 @{
     Layout = "_Layout";
+    ViewData["Title"] = "Book Appointment";
 }
+<h2>Book Appointment</h2>
 
-<head>
-    <title>title</title>
-</head>
-<body>
-<div>
-    <h1>Book Appointment</h1>
-</div>
-<footer>
-    <a asp-controller="Patient" asp-action="Index">Go back</a>
-</footer>
-</body>
+<form method="post" asp-action="Book">
+    <div class="mb-3">
+        <label>Doctor</label>
+        <select class="form-select" name="doctorId">
+            @foreach(var d in Model) { <option value="@d.Id">@d.Name (@d.Specialty)</option> }
+        </select>
+    </div>
+    <div class="mb-3">
+        <label>Date</label>
+        <input class="form-control" type="date" name="date" required />
+    </div>
+    <div class="mb-3">
+        <label>Hour (9..16)</label>
+        <input class="form-control" type="number" name="hour" min="9" max="16" value="9" />
+    </div>
+    <button class="btn btn-success" type="submit">Book</button>
+</form>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger mt-3">@TempData["Error"]</div>
+}
