@@ -18,6 +18,10 @@ builder.Services.AddScoped<PatientRepository>();
 
 // Service DI
 builder.Services.AddScoped<AuthenticationService>();
+builder.Services.AddScoped<AppointmentService>();
+builder.Services.AddScoped<AnalyticsService>();
+builder.Services.AddScoped<FeedbackService>();
+builder.Services.AddScoped<ValidationService>();
 
 // Sessions
 builder.Services.AddDistributedMemoryCache();
