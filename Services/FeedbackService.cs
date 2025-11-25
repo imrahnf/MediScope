@@ -1,6 +1,27 @@
-namespace MediScope.Services;
+using Microsoft.EntityFrameworkCore;
+using MediScope.Models;
 
-public class FeedbackService
+namespace MediScope.Services
 {
-    // Handles patient feedback processing
+    public class FeedbackService
+    {
+        private readonly MediScopeContext _context;
+
+        public FeedbackService(MediScopeContext context)
+        {
+            _context = context;
+        }
+
+        public async Task SubmitFeedbackAsync(Feedback feedback)
+        {
+            await _context.Feedbacks.AddAsync(feedback);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<Feedback>> GetAllFeedbacksAsync() =>
+            await _context.Feedbacks.Include(f => f.Patient).Include(f => f.Doctor).ToListAsync();
+
+        public async Task<IEnumerable<Feedback>> GetFeedbacksForDoctorAsync(int doctorId) =>
+            await _context.Feedbacks.Where(f => f.DoctorId == doctorId).ToListAsync();
+    }
 }

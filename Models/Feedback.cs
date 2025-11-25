@@ -7,5 +7,8 @@ public class Feedback
     public int DoctorId { get; set; }
     public string Message { get; set; } = "";
     public int Rating { get; set; } // 1–5
+    public Patient? Patient { get; set; }
+    public Doctor? Doctor { get; set; }
+
 
 }
