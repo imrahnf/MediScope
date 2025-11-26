@@ -2,21 +2,79 @@
     Layout = "_Layout";
     ViewData["Title"] = "Login";
 }
-<h2>Login</h2>
 
-<form method="post" asp-action="Login">
-    <div class="mb-3">
-        <label class="form-label">Username</label>
-        <input class="form-control" type="text" name="username" required />
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Password</label>
-        <input class="form-control" type="password" name="password" required />
-    </div>
-    <button class="btn btn-primary" type="submit">Login</button>
-</form>
+<style>
+    .login-container {
+        max-width: 420px;
+        margin: 60px auto;
+        padding: 40px;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.08);
+    }
 
-@if (ViewBag.Error != null)
-{
-    <div class="alert alert-danger mt-3">@ViewBag.Error</div>
-}
+    .login-header {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    .login-header i {
+        font-size: 48px;
+        color: #0d6efd;
+    }
+
+    .login-title {
+        font-size: 28px;
+        font-weight: 700;
+    }
+
+    .login-subtitle {
+        font-size: 15px;
+        color: #6c757d;
+        margin-top: 4px;
+    }
+
+    body {
+        background-color: #f5f7fa;
+    }
+</style>
+
+<div class="login-container">
+
+    <div class="login-header">
+        <i class="bi bi-hospital"></i>
+        <div class="login-title">Welcome to MediScope</div>
+        <div class="login-subtitle">
+            Please sign in to access your healthcare dashboard.
+        </div>
+    </div>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.Error
+        </div>
+    }
+
+    <form asp-action="Login" method="post">
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Username</label>
+            <input type="text" name="username" required class="form-control" placeholder="Enter your username" />
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label fw-semibold">Password</label>
+            <input type="password" name="password" required class="form-control" placeholder="Enter your password" />
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">
+            <i class="bi bi-box-arrow-in-right"></i> Login
+        </button>
+    </form>
+
+    <div class="text-center mt-3 text-muted" style="font-size: 13px;">
+        © MediScope 2025
+    </div>
+
+</div>
