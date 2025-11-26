@@ -7,13 +7,14 @@
 
 <h2 class="fw-bold mb-4">Doctors</h2>
 
-<a class="btn btn-primary mb-3" asp-controller="Admin" asp-action="CreateDoctor">+ Add Doctor</a>
+<a class="btn btn-primary mb-3" asp-action="CreateDoctor">+ Add Doctor</a>
 
 <table class="table table-striped table-hover shadow-sm">
     <thead class="table-primary">
     <tr>
         <th>Name</th>
         <th>Specialty</th>
+        <th>Department</th>
         <th style="width: 180px;"></th>
     </tr>
     </thead>
@@ -23,6 +24,7 @@
         <tr>
             <td>@d.Name</td>
             <td>@d.Specialty</td>
+            <td>@d.Department?.Name</td>
             <td>
                 <a asp-action="EditDoctor" asp-route-id="@d.Id"
                    class="btn btn-sm btn-warning">Edit</a>

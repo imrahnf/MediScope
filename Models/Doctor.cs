@@ -12,4 +12,8 @@ public class Doctor
     // FK to Identity
     public string? UserId { get; set; }
     public ApplicationUser? User { get; set; }
+    // DEPARTMENT
+    public int? DepartmentId { get; set; }
+    public Department? Department { get; set; }
+
 }

@@ -20,3 +20,24 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.table thead th {
+  vertical-align: middle;
+  font-weight: 600;
+}
+
+.table-hover tbody tr:hover {
+  background-color: #f2f6ff;
+}
+
+.shadow-sm {
+  border-radius: 8px !important;
+}
+
+form .form-control {
+  border-radius: 6px;
+}
+
+.btn {
+  border-radius: 6px !important;
+}

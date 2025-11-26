@@ -1,0 +1,8 @@
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success shadow-sm">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger shadow-sm">@TempData["Error"]</div>
+}

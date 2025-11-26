@@ -1,4 +1,5 @@
 @model MediScope.Models.Doctor
+
 @{
     Layout = "_Layout";
     ViewData["Title"] = "Edit Doctor";
@@ -13,13 +14,25 @@
 
 <form method="post" asp-action="EditDoctor" asp-route-id="@Model.Id">
     <div class="mb-3">
-        <label>Name</label>
+        <label class="form-label">Name</label>
         <input required class="form-control" name="name" value="@Model.Name" />
     </div>
 
     <div class="mb-3">
-        <label>Specialty</label>
+        <label class="form-label">Specialty</label>
         <input required class="form-control" name="specialty" value="@Model.Specialty" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Department</label>
+        <select class="form-select" name="departmentId" required>
+            @foreach (var dept in ViewBag.Departments)
+            {
+                <option value="@dept.Id" selected="@(dept.Id == Model.DepartmentId)">
+                    @dept.Name
+                </option>
+            }
+        </select>
     </div>
 
     <button class="btn btn-success">Save Changes</button>

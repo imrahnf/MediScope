@@ -46,25 +46,29 @@ namespace MediScope.Controllers
         }
 
         [HttpGet]
-        public IActionResult CreateDoctor()
+        public async Task<IActionResult> CreateDoctor()
         {
+            ViewBag.Departments = await _context.Departments.ToListAsync();
             return View("CreateDoctor");
         }
 
+
         [HttpPost]
-        public async Task<IActionResult> CreateDoctor(string name, string specialty)
+        public async Task<IActionResult> CreateDoctor(string name, string specialty, int departmentId)
         {
             var validation = _validator.ValidateDoctorCreation(name, specialty);
             if (!validation.Success)
             {
                 ViewBag.Error = validation.Message;
+                ViewBag.Departments = await _context.Departments.ToListAsync();
                 return View("CreateDoctor");
             }
 
             var doctor = new Doctor
             {
                 Name = name,
-                Specialty = specialty
+                Specialty = specialty,
+                DepartmentId = departmentId
             };
 
             _context.Doctors.Add(doctor);
@@ -79,11 +83,12 @@ namespace MediScope.Controllers
             var doctor = await _context.Doctors.FindAsync(id);
             if (doctor == null) return NotFound();
 
+            ViewBag.Departments = await _context.Departments.ToListAsync();
             return View("EditDoctor", doctor);
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditDoctor(int id, string name, string specialty)
+        public async Task<IActionResult> EditDoctor(int id, string name, string specialty, int departmentId)
         {
             var doctor = await _context.Doctors.FindAsync(id);
             if (doctor == null) return NotFound();
@@ -92,11 +97,13 @@ namespace MediScope.Controllers
             if (!validation.Success)
             {
                 ViewBag.Error = validation.Message;
+                ViewBag.Departments = await _context.Departments.ToListAsync();
                 return View("EditDoctor", doctor);
             }
 
             doctor.Name = name;
             doctor.Specialty = specialty;
+            doctor.DepartmentId = departmentId;
 
             await _context.SaveChangesAsync();
             return RedirectToAction("Doctors");
