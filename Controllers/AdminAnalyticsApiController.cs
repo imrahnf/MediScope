@@ -51,5 +51,25 @@ namespace MediScope.Controllers;
                 cancelled
             });
         }
+        [HttpGet("weeklyAppointments")]
+        public async Task<IActionResult> GetWeeklyAppointments()
+        {
+            var data = await _analytics.GetWeeklyAppointmentCountsAsync();
+            return Ok(data);
+        }
+
+        [HttpGet("doctorRatings")]
+        public async Task<IActionResult> GetDoctorRatings()
+        {
+            var data = await _analytics.GetDoctorRatingsAsync();
+            return Ok(data);
+        }
+
+        [HttpGet("feedbackSentiment")]
+        public async Task<IActionResult> GetFeedbackSentiment()
+        {
+            var data = await _analytics.GetFeedbackSentimentAsync();
+            return Ok(data);
+        }
     }
     

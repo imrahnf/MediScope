@@ -48,7 +48,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
-        // Appointments Trend
+        // 1. APPOINTMENTS TREND 
         fetch('/api/admin/analytics/appointments')
             .then(r => r.json())
             .then(data => {
@@ -57,16 +57,17 @@
                     data: {
                         labels: data.map(x => new Date(x.date).toLocaleDateString()),
                         datasets: [{
-                            label: 'Appointments',
+                            label: 'Appointments per Day',
                             data: data.map(x => x.value),
                             borderColor: 'blue',
+                            borderWidth: 2,
                             fill: false
                         }]
                     }
                 });
             });
 
-        // Ratings Chart
+        // 2. AVERAGE RATING 
         fetch('/api/admin/analytics/ratings')
             .then(r => r.json())
             .then(data => {
@@ -83,7 +84,8 @@
                 });
             });
 
-        // Status Breakdown
+
+        // 3. STATUS BREAKDOWN 
         fetch('/api/admin/analytics/statusBreakdown')
             .then(r => r.json())
             .then(data => {
@@ -94,6 +96,60 @@
                         datasets: [{
                             data: [data.scheduled, data.completed, data.cancelled],
                             backgroundColor: ['#0d6efd', '#198754', '#dc3545']
+                        }]
+                    }
+                });
+            });
+
+        // 4. WEEKLY APPOINTMENTS
+        fetch('/api/admin/analytics/weeklyAppointments')
+            .then(r => r.json())
+            .then(data => {
+                new Chart(document.getElementById('weeklyAppointmentsChart'), {
+                    type: 'line',
+                    data: {
+                        labels: data.map(x => x.weekLabel),
+                        datasets: [{
+                            label: 'Weekly Appointments',
+                            data: data.map(x => x.count),
+                            borderColor: 'purple',
+                            borderWidth: 2,
+                            fill: false
+                        }]
+                    }
+                });
+            });
+
+
+        // 5. DOCTOR RATINGS
+        fetch('/api/admin/analytics/doctorRatings')
+            .then(r => r.json())
+            .then(data => {
+                new Chart(document.getElementById('doctorRatingsChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: data.map(x => x.doctor),
+                        datasets: [{
+                            label: 'Avg Rating',
+                            data: data.map(x => x.avgRating),
+                            backgroundColor: '#ffa500'
+                        }]
+                    }
+                });
+            });
+
+
+        // 6. FEEDBACK SENTIMENT PIE CHART
+        fetch('/api/admin/analytics/feedbackSentiment')
+            .then(r => r.json())
+            .then(data => {
+                new Chart(document.getElementById('feedbackSentimentChart'), {
+                    type: 'pie',
+                    data: {
+                        labels: ['Positive', 'Neutral', 'Negative'],
+                        datasets: [{
+                            data: [data.positive, data.neutral, data.negative],
+                            backgroundColor: ['#28a745', '#ffc107', '#dc3545']
                         }]
                     }
                 });

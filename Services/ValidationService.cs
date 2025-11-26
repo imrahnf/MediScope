@@ -69,5 +69,49 @@ namespace MediScope.Services
             return ValidationResult.Ok();
         }
 
+        // Prevent Duplicate Resource Name
+        public ValidationResult ValidateUniqueResourceName(string name)
+        {
+            bool exists = _context.Resources.Any(r => r.Name.ToLower() == name.ToLower());
+
+            if (exists)
+                return ValidationResult.Fail("A resource with this name already exists.");
+
+            return ValidationResult.Ok();
+        }
+
+        // Validate Doctor-to-Department assignment (used in Phase 7)
+        public ValidationResult ValidateDepartmentExists(int departmentId)
+        {
+            bool exists = _context.Departments.Any(d => d.Id == departmentId);
+
+            return exists
+                ? ValidationResult.Ok()
+                : ValidationResult.Fail("Selected department does not exist.");
+        }
+
+        // Prevent deleting departments with assigned doctors
+        public ValidationResult ValidateDepartmentDeletion(int departmentId)
+        {
+            bool hasDoctors = _context.Doctors.Any(d => d.Specialty == departmentId.ToString());
+            // NOTE: Once doctor–department relationship is added, change this condition.
+
+            if (hasDoctors)
+                return ValidationResult.Fail("Cannot delete department — doctors are assigned to it.");
+
+            return ValidationResult.Ok();
+        }
+
+        // Validate feedback messages -- not using unless imrahn wanna use it 
+        public ValidationResult ValidateFeedback(string message, int rating)
+        {
+            if (string.IsNullOrWhiteSpace(message))
+                return ValidationResult.Fail("Feedback message cannot be empty.");
+
+            if (rating < 1 || rating > 5)
+                return ValidationResult.Fail("Rating must be between 1 and 5.");
+
+            return ValidationResult.Ok();
+        }
     }
 }
