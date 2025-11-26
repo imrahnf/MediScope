@@ -71,5 +71,41 @@ namespace MediScope.Controllers;
             var data = await _analytics.GetFeedbackSentimentAsync();
             return Ok(data);
         }
+        // TOTAL DOCTORS
+        [HttpGet("totalDoctors")]
+        public async Task<IActionResult> GetTotalDoctors()
+        {
+            var count = await _context.Doctors.CountAsync();
+            return Ok(new { count });
+        }
+
+        // TOTAL PATIENTS 
+        [HttpGet("totalPatients")]
+        public async Task<IActionResult> GetTotalPatients()
+        {
+            var count = await _context.Patients.CountAsync();
+            return Ok(new { count });
+        }
+
+        // TOTAL APPOINTMENTS
+        [HttpGet("totalAppointments")]
+        public async Task<IActionResult> GetTotalAppointments()
+        {
+            var count = await _context.Appointments.CountAsync();
+            return Ok(new { count });
+        }
+
+        // WEEKLY APPOINTMENTS SUMMARY
+        [HttpGet("weeklySummary")]
+        public async Task<IActionResult> GetWeeklySummary()
+        {
+            var since = DateTime.UtcNow.AddDays(-7);
+
+            var count = await _context.Appointments
+                .Where(a => a.Date >= since)
+                .CountAsync();
+
+            return Ok(new { count });
+        }
     }
     

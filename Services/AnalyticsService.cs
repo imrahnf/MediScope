@@ -1,5 +1,7 @@
 using MediScope.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
+
 
 namespace MediScope.Services
 {
@@ -33,21 +35,36 @@ namespace MediScope.Services
         // Weekly appointment totals
         public async Task<List<object>> GetWeeklyAppointmentCountsAsync()
         {
-            return await _context.Appointments
-                .GroupBy(a => new
-                {
-                    Year = a.Date.Year,
-                    Week = (a.Date.DayOfYear - 1) / 7 + 1
-                })
-                .Select(g => new
-                {
-                    WeekLabel = $"Week {g.Key.Week}, {g.Key.Year}",
-                    Count = g.Count()
-                })
-                .OrderBy(x => x.WeekLabel)
-                .ToListAsync<object>();
-        }
+            return await Task.Run(() =>
+                _context.Appointments
+                    .AsEnumerable()
+                    .GroupBy(a =>
+                    {
+                        var week = ISOWeek.GetWeekOfYear(a.Date);
+                        var year = a.Date.Year;
 
+                        // Calculate start of ISO week
+                        DateTime firstDay = ISOWeek.ToDateTime(year, week, DayOfWeek.Monday);
+                        DateTime lastDay = firstDay.AddDays(6);
+
+                        return new
+                        {
+                            Year = year,
+                            Week = week,
+                            Start = firstDay,
+                            End = lastDay
+                        };
+                    })
+                    .Select(g => new
+                    {
+                        weekLabel = $"{g.Key.Start:MMM dd} – {g.Key.End:MMM dd}",
+                        count = g.Count()
+                    })
+                    .OrderBy(x => x.weekLabel)
+                    .Cast<object>()
+                    .ToList()
+            );
+        }
 
         // Doctor rating averages
         public async Task<List<object>> GetDoctorRatingsAsync()

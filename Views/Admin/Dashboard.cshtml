@@ -13,29 +13,38 @@
     <!-- Quick Stats Cards -->
     <div class="row g-3 mb-4">
 
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card shadow-sm border-0 text-center">
                 <div class="card-body">
                     <h6 class="text-muted">Total Doctors</h6>
-                    <h2 class="fw-bold">@ViewBag.TotalDoctors</h2>
+                    <h2 id="totalDoctors" class="fw-bold">0</h2>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card shadow-sm border-0 text-center">
                 <div class="card-body">
                     <h6 class="text-muted">Total Patients</h6>
-                    <h2 class="fw-bold">@ViewBag.TotalPatients</h2>
+                    <h2 id="totalPatients" class="fw-bold">0</h2>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card shadow-sm border-0 text-center">
                 <div class="card-body">
                     <h6 class="text-muted">Total Appointments</h6>
-                    <h2 class="fw-bold">@ViewBag.TotalAppointments</h2>
+                    <h2 id="totalAppointments" class="fw-bold">0</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 text-center">
+                <div class="card-body">
+                    <h6 class="text-muted">Weekly Appointments</h6>
+                    <h2 id="weeklyAppointments" class="fw-bold">0</h2>
                 </div>
             </div>
         </div>
@@ -46,12 +55,12 @@
     <!-- Charts Section -->
     <div class="row g-4">
 
-        <!-- Weekly Appointments -->
+        <!-- Weekly Appointments Chart -->
         <div class="col-md-6">
             <div class="card shadow-sm border-0">
                 <div class="card-body">
                     <h5 class="card-title mb-3">
-                        <i class="bi bi-calendar-week"></i> Weekly Appointments
+                        <i class="bi bi-calendar-week"></i> Weekly Appointments (Chart)
                     </h5>
                     <canvas id="weeklyAppointmentsChart" height="150"></canvas>
                 </div>
@@ -122,64 +131,30 @@
 
 </div>
 
+
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
-        // 1. APPOINTMENTS TREND 
-        fetch('/api/admin/analytics/appointments')
+        // ---------- TOTALS (Top Cards) ----------
+        fetch('/api/admin/analytics/totalDoctors')
             .then(r => r.json())
-            .then(data => {
-                new Chart(document.getElementById('appointmentsChart'), {
-                    type: 'line',
-                    data: {
-                        labels: data.map(x => new Date(x.date).toLocaleDateString()),
-                        datasets: [{
-                            label: 'Appointments per Day',
-                            data: data.map(x => x.value),
-                            borderColor: 'blue',
-                            borderWidth: 2,
-                            fill: false
-                        }]
-                    }
-                });
-            });
+            .then(data => { document.getElementById('totalDoctors').innerText = data.count; });
 
-        // 2. AVERAGE RATING 
-        fetch('/api/admin/analytics/ratings')
+        fetch('/api/admin/analytics/totalPatients')
             .then(r => r.json())
-            .then(data => {
-                new Chart(document.getElementById('ratingChart'), {
-                    type: 'bar',
-                    data: {
-                        labels: ['Average Rating'],
-                        datasets: [{
-                            label: 'Rating',
-                            data: [data.average],
-                            backgroundColor: ['#ffcc00']
-                        }]
-                    }
-                });
-            });
+            .then(data => { document.getElementById('totalPatients').innerText = data.count; });
 
-
-        // 3. STATUS BREAKDOWN 
-        fetch('/api/admin/analytics/statusBreakdown')
+        fetch('/api/admin/analytics/totalAppointments')
             .then(r => r.json())
-            .then(data => {
-                new Chart(document.getElementById('statusChart'), {
-                    type: 'pie',
-                    data: {
-                        labels: ['Scheduled', 'Completed', 'Cancelled'],
-                        datasets: [{
-                            data: [data.scheduled, data.completed, data.cancelled],
-                            backgroundColor: ['#0d6efd', '#198754', '#dc3545']
-                        }]
-                    }
-                });
-            });
+            .then(data => { document.getElementById('totalAppointments').innerText = data.count; });
 
-        // 4. WEEKLY APPOINTMENTS
+        fetch('/api/admin/analytics/weeklySummary')
+            .then(r => r.json())
+            .then(data => { document.getElementById('weeklyAppointments').innerText = data.count; });
+
+
+        // ---------- WEEKLY APPOINTMENTS CHART ----------
         fetch('/api/admin/analytics/weeklyAppointments')
             .then(r => r.json())
             .then(data => {
@@ -199,7 +174,7 @@
             });
 
 
-        // 5. DOCTOR RATINGS
+        // ---------- DOCTOR RATINGS ----------
         fetch('/api/admin/analytics/doctorRatings')
             .then(r => r.json())
             .then(data => {
@@ -217,7 +192,44 @@
             });
 
 
-        // 6. FEEDBACK SENTIMENT PIE CHART
+        // ---------- APPOINTMENT TRENDS ----------
+        fetch('/api/admin/analytics/appointments')
+            .then(r => r.json())
+            .then(data => {
+                new Chart(document.getElementById('appointmentsChart'), {
+                    type: 'line',
+                    data: {
+                        labels: data.map(x => new Date(x.date).toLocaleDateString()),
+                        datasets: [{
+                            label: 'Appointments per Day',
+                            data: data.map(x => x.value),
+                            borderColor: 'blue',
+                            borderWidth: 2,
+                            fill: false
+                        }]
+                    }
+                });
+            });
+
+
+        // ---------- STATUS BREAKDOWN ----------
+        fetch('/api/admin/analytics/statusBreakdown')
+            .then(r => r.json())
+            .then(data => {
+                new Chart(document.getElementById('statusChart'), {
+                    type: 'pie',
+                    data: {
+                        labels: ['Scheduled', 'Completed', 'Cancelled'],
+                        datasets: [{
+                            data: [data.scheduled, data.completed, data.cancelled],
+                            backgroundColor: ['#0d6efd', '#198754', '#dc3545']
+                        }]
+                    }
+                });
+            });
+
+
+        // ---------- FEEDBACK SENTIMENT ----------
         fetch('/api/admin/analytics/feedbackSentiment')
             .then(r => r.json())
             .then(data => {
@@ -228,6 +240,23 @@
                         datasets: [{
                             data: [data.positive, data.neutral, data.negative],
                             backgroundColor: ['#28a745', '#ffc107', '#dc3545']
+                        }]
+                    }
+                });
+            });
+
+        // ---------- AVERAGE RATING ----------
+        fetch('/api/admin/analytics/ratings')
+            .then(r => r.json())
+            .then(data => {
+                new Chart(document.getElementById('ratingChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Average Rating'],
+                        datasets: [{
+                            label: 'Rating',
+                            data: [data.average],
+                            backgroundColor: ['#ffcc00']
                         }]
                     }
                 });
