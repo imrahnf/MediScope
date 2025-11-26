@@ -1,0 +1,31 @@
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Add Resource";
+}
+
+<h2 class="fw-bold mb-4">Add Resource</h2>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+
+<form method="post" asp-action="Create">
+    <div class="mb-3">
+        <label>Name</label>
+        <input name="name" class="form-control" required />
+    </div>
+
+    <div class="mb-3">
+        <label>Type</label>
+        <input name="type" class="form-control" required />
+    </div>
+
+    <div class="mb-3">
+        <label>Quantity</label>
+        <input name="quantity" type="number" class="form-control" value="0" required />
+    </div>
+
+    <button class="btn btn-success">Save</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>

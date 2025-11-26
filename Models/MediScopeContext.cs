@@ -16,6 +16,5 @@ public class MediScopeContext : IdentityDbContext<ApplicationUser>
     public DbSet<AnalyticsRecord> AnalyticsRecords { get; set; }
     public DbSet<TestResult> TestResults { get; set; }
     public DbSet<Department> Departments { get; set; }
-
-    
+    public DbSet<Resource> Resources { get; set; }
 }

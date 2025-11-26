@@ -251,6 +251,28 @@ namespace MediScope.Migrations
                     b.ToTable("Patients");
                 });
 
+            modelBuilder.Entity("MediScope.Models.Resource", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Resources");
+                });
+
             modelBuilder.Entity("MediScope.Models.TestResult", b =>
                 {
                     b.Property<int>("Id")

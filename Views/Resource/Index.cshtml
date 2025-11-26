@@ -1,0 +1,40 @@
+@model IEnumerable<MediScope.Models.Resource>
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Medical Resources";
+}
+
+<h2 class="fw-bold mb-4">Medical Resources</h2>
+
+<a class="btn btn-primary mb-3" asp-action="Create">+ Add Resource</a>
+
+<table class="table table-striped table-hover shadow-sm">
+    <thead class="table-secondary">
+    <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Quantity</th>
+        <th style="width: 180px;"></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var r in Model)
+    {
+        <tr>
+            <td>@r.Name</td>
+            <td>@r.Type</td>
+            <td>@r.Quantity</td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@r.Id" class="btn btn-sm btn-warning">Edit</a>
+
+                <form method="post" asp-action="Delete" asp-route-id="@r.Id"
+                      style="display:inline-block">
+                    <button class="btn btn-sm btn-danger"
+                            onclick="return confirm('Delete resource?');">Delete</button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

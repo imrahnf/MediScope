@@ -16,6 +16,7 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<AppointmentRepository>();
 builder.Services.AddScoped<PatientRepository>();
 builder.Services.AddScoped<DepartmentRepository>();
+builder.Services.AddScoped<ResourceRepository>();
 
 // Service DI
 builder.Services.AddScoped<AuthenticationService>();

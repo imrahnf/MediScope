@@ -55,7 +55,7 @@ namespace MediScope.Services
         }
 
         // ADMIN: Validate Resource Creation 
-        public ValidationResult ValidateResource(string name, string type)
+        public ValidationResult ValidateResource(string name, string type, int quantity)
         {
             if (string.IsNullOrWhiteSpace(name))
                 return ValidationResult.Fail("Resource name cannot be empty.");
@@ -63,7 +63,11 @@ namespace MediScope.Services
             if (string.IsNullOrWhiteSpace(type))
                 return ValidationResult.Fail("Resource type cannot be empty.");
 
+            if (quantity < 0)
+                return ValidationResult.Fail("Quantity cannot be negative.");
+
             return ValidationResult.Ok();
         }
+
     }
 }
