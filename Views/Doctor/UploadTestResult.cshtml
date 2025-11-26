@@ -1,0 +1,29 @@
+@{
+    Layout = "_Layout";
+}
+
+<h2 class="fw-bold mb-4">Upload Test Result</h2>
+
+<div class="card">
+    <div class="card-body">
+        <form asp-action="UploadTestResult" method="post">
+            <input type="hidden" name="appointmentId" value="@ViewBag.AppointmentId" />
+            <input type="hidden" name="patientId" value="@ViewBag.PatientId" />
+            
+            <div class="mb-3">
+                <label for="testName" class="form-label">Test Name</label>
+                <input type="text" class="form-control" id="testName" name="testName" required />
+            </div>
+            
+            <div class="mb-3">
+                <label for="result" class="form-label">Result</label>
+                <textarea class="form-control" id="result" name="result" rows="5" required></textarea>
+            </div>
+            
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-success">Upload</button>
+                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
