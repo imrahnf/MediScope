@@ -39,10 +39,17 @@ else
                             <div class="col-md-3"><strong>Date Performed:</strong></div>
                             <div class="col-md-9">@r.val.DatePerformed.ToString("MMMM dd, yyyy")</div>
                         </div>
-                        <div class="row">
+                        <div class="row mb-3">
                             <div class="col-md-3"><strong>Result:</strong></div>
                             <div class="col-md-9">
                                 <div class="border rounded p-3 bg-light">@r.val.Result</div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <a asp-action="DownloadTestResult" asp-route-id="@r.val.Id" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-download"></i> Download as Text File
+                                </a>
                             </div>
                         </div>
                     </div>

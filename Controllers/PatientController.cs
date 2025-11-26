@@ -94,5 +94,45 @@ namespace MediScope.Controllers
 
             return View("TestResult", result);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> DownloadTestResult(int id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var patient = await _context.Patients.FirstOrDefaultAsync(p => p.UserId == userId);
+            if (patient == null) return RedirectToAction("Login", "Account");
+
+            var result = await _context.TestResults
+                .Include(tr => tr.Doctor)
+                .FirstOrDefaultAsync(tr => tr.Id == id && tr.PatientId == patient.Id);
+
+            if (result == null)
+            {
+                TempData["Message"] = "Test result not found or does not belong to you.";
+                return RedirectToAction("TestResults");
+            }
+
+            // Generate text file content
+            var content = $@"TEST RESULT
+            ================================================================================
+
+            Patient Name: {patient.Name}
+            Test Name: {result.TestName}
+            Date Performed: {result.DatePerformed:MMMM dd, yyyy}
+            Doctor: {result.Doctor?.Name ?? "N/A"}
+
+            RESULT:
+            --------------------------------------------------------------------------------
+            {result.Result}
+
+            ================================================================================
+            Generated on: {DateTime.Now:MMMM dd, yyyy HH:mm}
+            ";
+
+            var bytes = System.Text.Encoding.UTF8.GetBytes(content);
+            var fileName = $"TestResult_{result.TestName.Replace(" ", "_")}_{result.DatePerformed:yyyyMMdd}.txt";
+            
+            return File(bytes, "text/plain", fileName);
+        }
     }
 }
