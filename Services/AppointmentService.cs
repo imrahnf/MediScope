@@ -67,7 +67,6 @@ namespace MediScope.Services
             var appt = await _context.Appointments.FindAsync(appointmentId);
             if (appt == null) return false;
 
-            // In a real app validate doctorUserId maps to the appointment's doctor.
             appt.Status = "Completed";
             await _context.SaveChangesAsync();
             return true;

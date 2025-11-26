@@ -1,0 +1,53 @@
+@model MediScope.Models.TestResult
+
+@{
+    Layout = "_Layout";
+}
+
+<h2 class="fw-bold mb-4">Test Result Details</h2>
+
+<div class="card">
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <strong>Patient Name:</strong>
+            </div>
+            <div class="col-md-9">
+                @Model.Patient.Name
+            </div>
+        </div>
+        
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <strong>Test Name:</strong>
+            </div>
+            <div class="col-md-9">
+                @Model.TestName
+            </div>
+        </div>
+        
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <strong>Date Performed:</strong>
+            </div>
+            <div class="col-md-9">
+                @Model.DatePerformed.ToString("MMMM dd, yyyy")
+            </div>
+        </div>
+        
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <strong>Result:</strong>
+            </div>
+            <div class="col-md-9">
+                <div class="border rounded p-3 bg-light">
+                    @Model.Result
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <a asp-action="Index" class="btn btn-primary">Back to Appointments</a>
+        </div>
+    </div>
+</div>

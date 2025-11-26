@@ -24,14 +24,15 @@ namespace MediScope.Controllers
             if (doctor == null)
                 return RedirectToAction("Login", "Account");
 
-            var today = DateTime.Today;
-
-            var todaysAppointments = await _context.Appointments
+            // Show all appointments for this doctor, ordered by date (newest first)
+            var appointments = await _context.Appointments
                 .Include(a => a.Patient)
-                .Where(a => a.DoctorId == doctor.Id && a.Date.Date == today)
+                .ThenInclude(p => p.TestResults)
+                .Where(a => a.DoctorId == doctor.Id)
+                .OrderByDescending(a => a.Date)
                 .ToListAsync();
 
-            return View("Index", todaysAppointments);
+            return View("Index", appointments);
         }
 
         [HttpGet]
@@ -55,12 +56,54 @@ namespace MediScope.Controllers
             {
                 DoctorId = doctor.Id,
                 PatientId = patientId,
+                AppointmentId = appointmentId,
                 TestName = testName,
                 Result = result,
                 DatePerformed = DateTime.Now
             };
 
             _context.TestResults.Add(test);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> TestResultPage(int id)
+        {
+            var testResult = await _context.TestResults
+                .Include(t => t.Patient)
+                .FirstOrDefaultAsync(t => t.Id == id);
+
+            if (testResult == null)
+                return RedirectToAction("Index");
+
+            return View("TestResultPage", testResult);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AcceptAppointment(int id)
+        {
+            var appointment = await _context.Appointments.FindAsync(id);
+            
+            if (appointment == null)
+                return RedirectToAction("Index");
+
+            appointment.Status = "Confirmed";
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RejectAppointment(int id)
+        {
+            var appointment = await _context.Appointments.FindAsync(id);
+            
+            if (appointment == null)
+                return RedirectToAction("Index");
+
+            appointment.Status = "Rejected";
             await _context.SaveChangesAsync();
 
             return RedirectToAction("Index");
