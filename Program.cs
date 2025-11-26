@@ -14,6 +14,8 @@ builder.Services.AddControllersWithViews();
 // Repo DI
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<AppointmentRepository>();
+builder.Services.AddScoped<AdminRepository>();
+builder.Services.AddScoped<DoctorRepository>();
 builder.Services.AddScoped<PatientRepository>();
 builder.Services.AddScoped<DepartmentRepository>();
 builder.Services.AddScoped<ResourceRepository>();
