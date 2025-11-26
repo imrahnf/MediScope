@@ -1,0 +1,102 @@
+@model MediScope.Models.ViewModels.AdminDashboardViewModel
+@{
+    Layout = "_Layout";
+}
+
+<h2 class="fw-bold mb-4">Admin Dashboard</h2>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm p-3">
+            <h5>Total Doctors</h5>
+            <h2>@Model.TotalDoctors</h2>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm p-3">
+            <h5>Total Patients</h5>
+            <h2>@Model.TotalPatients</h2>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm p-3">
+            <h5>Average Rating</h5>
+            <h2>@Model.AverageRating.ToString("0.0") ★</h2>
+        </div>
+    </div>
+</div>
+
+<h4 class="mb-3">Analytics</h4>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <canvas id="appointmentsChart"></canvas>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <canvas id="ratingChart"></canvas>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <canvas id="statusChart"></canvas>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // Appointments Trend
+        fetch('/api/admin/analytics/appointments')
+            .then(r => r.json())
+            .then(data => {
+                new Chart(document.getElementById('appointmentsChart'), {
+                    type: 'line',
+                    data: {
+                        labels: data.map(x => new Date(x.date).toLocaleDateString()),
+                        datasets: [{
+                            label: 'Appointments',
+                            data: data.map(x => x.value),
+                            borderColor: 'blue',
+                            fill: false
+                        }]
+                    }
+                });
+            });
+
+        // Ratings Chart
+        fetch('/api/admin/analytics/ratings')
+            .then(r => r.json())
+            .then(data => {
+                new Chart(document.getElementById('ratingChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Average Rating'],
+                        datasets: [{
+                            label: 'Rating',
+                            data: [data.average],
+                            backgroundColor: ['#ffcc00']
+                        }]
+                    }
+                });
+            });
+
+        // Status Breakdown
+        fetch('/api/admin/analytics/statusBreakdown')
+            .then(r => r.json())
+            .then(data => {
+                new Chart(document.getElementById('statusChart'), {
+                    type: 'pie',
+                    data: {
+                        labels: ['Scheduled', 'Completed', 'Cancelled'],
+                        datasets: [{
+                            data: [data.scheduled, data.completed, data.cancelled],
+                            backgroundColor: ['#0d6efd', '#198754', '#dc3545']
+                        }]
+                    }
+                });
+            });
+    </script>
+}

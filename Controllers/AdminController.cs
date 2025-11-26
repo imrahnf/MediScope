@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MediScope.Services;
-using MediScope.Models;
 using Microsoft.EntityFrameworkCore;
+using MediScope.Models;
+using MediScope.Services;
+using MediScope.Models.ViewModels;
 
 namespace MediScope.Controllers
 {
@@ -11,35 +12,92 @@ namespace MediScope.Controllers
     {
         private readonly MediScopeContext _context;
         private readonly AnalyticsService _analytics;
+        private readonly ValidationService _validator;
 
-        public AdminController(MediScopeContext context, AnalyticsService analytics)
+        public AdminController(
+            MediScopeContext context,
+            AnalyticsService analytics,
+            ValidationService validator)
         {
             _context = context;
             _analytics = analytics;
+            _validator = validator;
         }
 
-        public async Task<IActionResult> Index()
+        // DASHBOARD
+        public async Task<IActionResult> Dashboard()
         {
-            var avgRating = await _analytics.GetAverageFeedbackRatingAsync();
-            var recentAnalytics = await _analytics.GetRecentAnalyticsAsync(20);
-            ViewBag.AvgRating = avgRating;
-            return View(recentAnalytics);
+            var model = new AdminDashboardViewModel
+            {
+                TotalDoctors = await _context.Doctors.CountAsync(),
+                TotalPatients = await _context.Patients.CountAsync(),
+                AverageRating = await _analytics.GetAverageFeedbackRatingAsync(),
+                RecentRecords = await _analytics.GetRecentAnalyticsAsync(7)
+            };
+
+            return View("Dashboard", model);
         }
 
+        // DOCTOR MANAGEMENT
         public async Task<IActionResult> Doctors()
         {
             var doctors = await _context.Doctors.ToListAsync();
-            return View(doctors);
+            return View("Doctors", doctors);
         }
 
         [HttpGet]
-        public IActionResult CreateDoctor() => View();
+        public IActionResult CreateDoctor()
+        {
+            return View("CreateDoctor");
+        }
 
         [HttpPost]
-        public async Task<IActionResult> CreateDoctor(string name, string specialty, string? userId)
+        public async Task<IActionResult> CreateDoctor(string name, string specialty)
         {
-            var doctor = new Doctor { Name = name, Specialty = specialty, UserId = userId };
-            await _context.Doctors.AddAsync(doctor);
+            var validation = _validator.ValidateDoctorCreation(name, specialty);
+            if (!validation.Success)
+            {
+                ViewBag.Error = validation.Message;
+                return View("CreateDoctor");
+            }
+
+            var doctor = new Doctor
+            {
+                Name = name,
+                Specialty = specialty
+            };
+
+            _context.Doctors.Add(doctor);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Doctors");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EditDoctor(int id)
+        {
+            var doctor = await _context.Doctors.FindAsync(id);
+            if (doctor == null) return NotFound();
+
+            return View("EditDoctor", doctor);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditDoctor(int id, string name, string specialty)
+        {
+            var doctor = await _context.Doctors.FindAsync(id);
+            if (doctor == null) return NotFound();
+
+            var validation = _validator.ValidateDoctorCreation(name, specialty);
+            if (!validation.Success)
+            {
+                ViewBag.Error = validation.Message;
+                return View("EditDoctor", doctor);
+            }
+
+            doctor.Name = name;
+            doctor.Specialty = specialty;
+
             await _context.SaveChangesAsync();
             return RedirectToAction("Doctors");
         }
@@ -47,17 +105,36 @@ namespace MediScope.Controllers
         [HttpPost]
         public async Task<IActionResult> DeleteDoctor(int id)
         {
-            var d = await _context.Doctors.FindAsync(id);
-            if (d == null) return NotFound();
-            _context.Doctors.Remove(d);
-            await _context.SaveChangesAsync();
-            return RedirectToAction("Doctors");
-        }
+            var doctor = await _context.Doctors.FindAsync(id);
+            if (doctor == null) return NotFound();
 
+            _context.Doctors.Remove(doctor);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Doctors");
+        } 
+        // FEEDBACK REVIEW
         public async Task<IActionResult> Feedback()
         {
-            var feedbacks = await _context.Feedbacks.Include(f => f.Doctor).Include(f => f.Patient).ToListAsync();
-            return View(feedbacks);
+            var feedback = await _context.Feedbacks
+                .Include(f => f.Doctor)
+                .Include(f => f.Patient)
+                .ToListAsync();
+
+            return View("Feedback", feedback);
+        }
+
+        // PLACEHOLDER: RESOURCE MANAGEMENT
+        public IActionResult Resources()
+        {
+            return View("Resources");
+        }
+
+        // PLACEHOLDER: DEPARTMENT MANAGEMENT
+        public IActionResult Departments()
+        {
+            // Will be implemented when we create Department model
+            return View("Departments");
         }
     }
 }
