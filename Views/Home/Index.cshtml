@@ -1,7 +1,223 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    Layout = "_Layout";
+    ViewData["Title"] = "Welcome to MediScope";
 }
 
-<div class="text-center">
-    <h1 class="display-4">MediScope</h1>
+<style>
+    .hero-section {
+        padding: 60px 0 40px 0;
+    }
+
+    .hero-title {
+        font-size: 34px;
+        font-weight: 800;
+    }
+
+    .hero-subtitle {
+        font-size: 16px;
+        color: #6c757d;
+        max-width: 560px;
+    }
+
+    .feature-card {
+        border-radius: 12px;
+        height: 100%;
+    }
+
+    .feature-icon {
+        font-size: 36px;
+    }
+
+    .login-table {
+        background: #ffffff;
+        border-radius: 12px;
+    }
+</style>
+
+<div class="container py-4">
+
+    <!-- Hero -->
+    <div class="row hero-section align-items-center g-4">
+        <div class="col-md-7">
+            <h1 class="hero-title mb-3">
+                <i class="bi bi-hospital"></i> MediScope Clinical Portal
+            </h1>
+            <p class="hero-subtitle mb-4">
+                MediScope is a role-based hospital management prototype that simulates how 
+                administrators, doctors, and patients interact with appointments, resources, 
+                and feedback in a modern healthcare system.
+            </p>
+
+            <ul class="list-unstyled mb-4">
+                <li class="mb-2">
+                    <i class="bi bi-check-circle text-success"></i>
+                    Admins configure doctors, departments, and medical resources, and view analytics dashboards.
+                </li>
+                <li class="mb-2">
+                    <i class="bi bi-check-circle text-success"></i>
+                    Doctors can review their appointments and (in the full system) manage patient test results.
+                </li>
+                <li class="mb-2">
+                    <i class="bi bi-check-circle text-success"></i>
+                    Patients can log in to view their portal, book appointments, and submit feedback.
+                </li>
+            </ul>
+
+            <a asp-controller="Account" asp-action="Login"
+               class="btn btn-primary btn-lg px-4">
+                <i class="bi bi-box-arrow-in-right"></i> Go to Login
+            </a>
+        </div>
+
+        <div class="col-md-5">
+            <div class="card shadow-sm border-0 mb-3">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-2">
+                        <i class="bi bi-speedometer2 text-primary"></i> Project Overview
+                    </h5>
+                    <p class="mb-2">
+                        This ASP.NET Core MVC project demonstrates:
+                    </p>
+                    <ul class="mb-0">
+                        <li>Identity-based authentication and role management</li>
+                        <li>Clean separation of Controllers, Services, and Repositories</li>
+                        <li>Entity Framework Core with SQLite and seeded test data</li>
+                        <li>Admin analytics using Chart.js</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h6 class="text-muted mb-1">Created by</h6>
+                    <p class="fw-semibold mb-0">Maryam Elhamidi &amp; Omrahn Faqiri</p>
+                    <p class="text-muted mb-0" style="font-size: 13px;">
+                        For Sheridan College – MediScope hospital management prototype.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feature cards -->
+    <div class="row g-4 mb-5">
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 feature-card">
+                <div class="card-body">
+                    <div class="feature-icon text-primary mb-3">
+                        <i class="bi bi-person-gear"></i>
+                    </div>
+                    <h5 class="fw-bold">Admin Module</h5>
+                    <p class="text-muted mb-2">
+                        Configure doctors, departments, and medical resources. 
+                        Review patient feedback and monitor key metrics from a centralized dashboard.
+                    </p>
+                    <ul class="text-muted small mb-0">
+                        <li>Doctor management (add/edit/delete)</li>
+                        <li>Department &amp; resource setup</li>
+                        <li>Feedback review</li>
+                        <li>Analytics with Chart.js</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 feature-card">
+                <div class="card-body">
+                    <div class="feature-icon text-success mb-3">
+                        <i class="bi bi-stethoscope"></i>
+                    </div>
+                    <h5 class="fw-bold">Doctor Module</h5>
+                    <p class="text-muted mb-2">
+                        Doctors log in to access a personalized workspace 
+                        for viewing appointments and working with clinical data.
+                    </p>
+                    <ul class="text-muted small mb-0">
+                        <li>Role-based access via Identity</li>
+                        <li>View scheduled appointments</li>
+                        <li>Designed to expand into test result workflows</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 feature-card">
+                <div class="card-body">
+                    <div class="feature-icon text-info mb-3">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <h5 class="fw-bold">Patient Module</h5>
+                    <p class="text-muted mb-2">
+                        Patients can sign in to their portal to book appointments 
+                        and provide feedback about their care experience.
+                    </p>
+                    <ul class="text-muted small mb-0">
+                        <li>Patient role with restricted access</li>
+                        <li>Appointment booking UI</li>
+                        <li>Feedback submission (used in admin analytics)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Default Login Info -->
+    <div class="login-table card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <h4 class="fw-bold mb-3">Default Login Info</h4>
+            <p class="text-muted mb-3">
+                Use the following seeded accounts to explore the system as different roles.
+            </p>
+
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Username</th>
+                            <th>Password</th>
+                            <th>Role</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>admin</td>
+                            <td>Admin@123!</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td>doctor1</td>
+                            <td>Doc@123!</td>
+                            <td>Doctor</td>
+                        </tr>
+                        <tr>
+                            <td>doctor2</td>
+                            <td>Doc@123!</td>
+                            <td>Doctor</td>
+                        </tr>
+                        <tr>
+                            <td>patient1</td>
+                            <td>Pat@123!</td>
+                            <td>Patient</td>
+                        </tr>
+                        <tr>
+                            <td>patient2</td>
+                            <td>Pat@123!</td>
+                            <td>Patient</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-3">
+                <a asp-controller="Account" asp-action="Login" class="btn btn-primary">
+                    <i class="bi bi-box-arrow-in-right"></i> Go to Login
+                </a>
+            </div>
+        </div>
+    </div>
+
 </div>
