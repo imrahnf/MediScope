@@ -21,6 +21,7 @@ public class AccountController : Controller
     // Sign In
     [HttpPost]
     [AllowAnonymous]
+    [HttpPost]
     public async Task<IActionResult> Login(string username, string password)
     {
         var result = await _signInManager.PasswordSignInAsync(username, password, false, false);
@@ -30,26 +31,27 @@ public class AccountController : Controller
             ViewBag.Error = "Invalid username or password";
             return View();
         }
-        
+
         var user = await _userManager.FindByNameAsync(username);
         var roles = await _userManager.GetRolesAsync(user);
-        
-        if (roles.Contains("Patient"))
+
+        if (roles.Contains("Admin"))
         {
-            return RedirectToAction("Index", "Patient");
+            return RedirectToAction("Dashboard", "Admin");
         }
         else if (roles.Contains("Doctor"))
         {
             return RedirectToAction("Index", "Doctor");
         }
-        else if (roles.Contains("Admin"))
+        else if (roles.Contains("Patient"))
         {
-            return RedirectToAction("Index", "Admin");
+            return RedirectToAction("Index", "Patient");
         }
-        
-        return RedirectToAction("Login", "Account");
+
+        // fallback
+        return RedirectToAction("Login");
     }
-    
+
     // Logout
     [AllowAnonymous]
     public async Task<IActionResult> Logout()
