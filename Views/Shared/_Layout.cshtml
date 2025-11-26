@@ -6,6 +6,7 @@
     <title>@ViewData["Title"] - MediScope</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
     <style>
         body {
@@ -31,9 +32,12 @@
 
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
     <div class="container-fluid">
-        <a class="navbar-brand" asp-controller="Home" asp-action="Index">MediScope</a>
+
+        <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index">
+            <i class="bi bi-hospital"></i> MediScope
+        </a>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbarNav" aria-controls="navbarNav"
@@ -44,48 +48,74 @@
         <div class="collapse navbar-collapse" id="navbarNav">
 
             <ul class="navbar-nav me-auto">
-
-                @if (User.IsInRole("Patient"))
+                @if (User.IsInRole("Admin"))
                 {
                     <li class="nav-item">
-                        <a class="nav-link" asp-controller="Patient" asp-action="Index">Dashboard</a>
+                        <a class="nav-link" asp-controller="Admin" asp-action="Dashboard">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="Doctors">
+                            <i class="bi bi-person-badge"></i> Doctors
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Department" asp-action="Index">
+                            <i class="bi bi-diagram-3"></i> Departments
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Resource" asp-action="Index">
+                            <i class="bi bi-boxes"></i> Resources
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="Feedback">
+                            <i class="bi bi-chat-left-dots"></i> Feedback
+                        </a>
                     </li>
                 }
 
                 @if (User.IsInRole("Doctor"))
                 {
                     <li class="nav-item">
-                        <a class="nav-link" asp-controller="Doctor" asp-action="Index">My Appointments</a>
+                        <a class="nav-link" asp-controller="Doctor" asp-action="Index">
+                            <i class="bi bi-calendar-event"></i> My Appointments
+                        </a>
                     </li>
                 }
 
-                @if (User.IsInRole("Administrator"))
+                @if (User.IsInRole("Patient"))
                 {
                     <li class="nav-item">
-                        <a class="nav-link" asp-controller="Admin" asp-action="Dashboard">Admin Dashboard</a>
+                        <a class="nav-link" asp-controller="Patient" asp-action="Index">
+                            <i class="bi bi-house-heart"></i> Patient Home
+                        </a>
                     </li>
                 }
-
             </ul>
 
             <ul class="navbar-nav ms-auto">
-
                 @if (User.Identity.IsAuthenticated)
                 {
                     <li class="nav-item">
-                        <a class="nav-link text-white small">Hello, @User.Identity.Name</a>
+                        <span class="nav-link text-white">
+                            <i class="bi bi-person-circle"></i>
+                            Hello, @User.Identity.Name
+                        </span>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Account" asp-action="Logout">Logout</a>
-                    </li>
-                }
-                else
-                {
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Account" asp-action="Login">Login</a>
-                    </li>
-                }
 
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Account" asp-action="Logout">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </a>
+                    </li>
+                }
             </ul>
 
         </div>
@@ -95,6 +125,7 @@
 <div class="container mt-4">
     <main role="main" class="pb-3">
         @RenderBody()
+        @await Html.PartialAsync("_Alert")
     </main>
 </div>
 

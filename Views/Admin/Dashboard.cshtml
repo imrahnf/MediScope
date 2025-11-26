@@ -1,49 +1,138 @@
 @model MediScope.Models.ViewModels.AdminDashboardViewModel
 @{
     Layout = "_Layout";
+    ViewData["Title"] = "Admin Dashboard";
 }
 
-<h2 class="fw-bold mb-4">Admin Dashboard</h2>
+<div class="container py-4">
 
-<div class="row mb-4">
-    <div class="col-md-4">
-        <div class="card shadow-sm p-3">
-            <h5>Total Doctors</h5>
-            <h2>@Model.TotalDoctors</h2>
+    <h2 class="fw-bold mb-4">
+        <i class="bi bi-speedometer2"></i> Admin Dashboard
+    </h2>
+
+    <!-- Quick Stats Cards -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 text-center">
+                <div class="card-body">
+                    <h6 class="text-muted">Total Doctors</h6>
+                    <h2 class="fw-bold">@ViewBag.TotalDoctors</h2>
+                </div>
+            </div>
         </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 text-center">
+                <div class="card-body">
+                    <h6 class="text-muted">Total Patients</h6>
+                    <h2 class="fw-bold">@ViewBag.TotalPatients</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 text-center">
+                <div class="card-body">
+                    <h6 class="text-muted">Total Appointments</h6>
+                    <h2 class="fw-bold">@ViewBag.TotalAppointments</h2>
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <div class="col-md-4">
-        <div class="card shadow-sm p-3">
-            <h5>Total Patients</h5>
-            <h2>@Model.TotalPatients</h2>
+
+    <!-- Charts Section -->
+    <div class="row g-4">
+
+        <!-- Weekly Appointments -->
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="bi bi-calendar-week"></i> Weekly Appointments
+                    </h5>
+                    <canvas id="weeklyAppointmentsChart" height="150"></canvas>
+                </div>
+            </div>
         </div>
+
+        <!-- Doctor Ratings -->
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="bi bi-star-half"></i> Doctor Ratings
+                    </h5>
+                    <canvas id="doctorRatingsChart" height="150"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Appointment Trends -->
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="bi bi-graph-up"></i> Appointment Trends
+                    </h5>
+                    <canvas id="appointmentsChart" height="150"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Breakdown -->
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="bi bi-pie-chart"></i> Appointment Status Breakdown
+                    </h5>
+                    <canvas id="statusChart" height="150"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feedback Sentiment -->
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="bi bi-emoji-smile"></i> Feedback Sentiment
+                    </h5>
+                    <canvas id="feedbackSentimentChart" height="150"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Average Rating -->
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="bi bi-bar-chart"></i> Average Feedback Rating
+                    </h5>
+                    <canvas id="ratingChart" height="150"></canvas>
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <div class="col-md-4">
-        <div class="card shadow-sm p-3">
-            <h5>Average Rating</h5>
-            <h2>@Model.AverageRating.ToString("0.0") ★</h2>
-        </div>
-    </div>
 </div>
 
-<h4 class="mb-3">Analytics</h4>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<div class="row">
-    <div class="col-md-6 mb-4">
-        <canvas id="appointmentsChart"></canvas>
-    </div>
+    <script>
+        // FULL chart.js script block (Phase 6)
+        // Already provided to you earlier
+        // ↓↓↓ COPY THE EXACT SCRIPT YOU ALREADY HAVE ↓↓↓
 
-    <div class="col-md-6 mb-4">
-        <canvas id="ratingChart"></canvas>
-    </div>
-
-    <div class="col-md-6 mb-4">
-        <canvas id="statusChart"></canvas>
-    </div>
-</div>
-
+        // Weekly, Ratings, Sentiment, etc...
+    </script>
+}
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
