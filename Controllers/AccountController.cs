@@ -37,7 +37,7 @@ public class AccountController : Controller
 
         if (roles.Contains("Admin"))
         {
-            return RedirectToAction("Dashboard", "Admin");
+            return RedirectToAction("Index", "Admin");
         }
         else if (roles.Contains("Doctor"))
         {
