@@ -113,21 +113,17 @@ namespace MediScope.Controllers
             }
 
             // Generate text file content
-            var content = $@"TEST RESULT
-            ================================================================================
-
-            Patient Name: {patient.Name}
-            Test Name: {result.TestName}
-            Date Performed: {result.DatePerformed:MMMM dd, yyyy}
-            Doctor: {result.Doctor?.Name ?? "N/A"}
-
-            RESULT:
-            --------------------------------------------------------------------------------
-            {result.Result}
-
-            ================================================================================
-            Generated on: {DateTime.Now:MMMM dd, yyyy HH:mm}
-            ";
+            var content = $"TEST RESULT\n";
+            content += "================================================================================\n\n";
+            content += $"Patient Name:     {patient.Name}\n";
+            content += $"Test Name:        {result.TestName}\n";
+            content += $"Date Performed:   {result.DatePerformed:MMMM dd, yyyy}\n";
+            content += $"Doctor:           {result.Doctor?.Name ?? "N/A"}\n\n";
+            content += "RESULT:\n";
+            content += "--------------------------------------------------------------------------------\n";
+            content += $"{result.Result}\n";
+            content += "\n================================================================================\n";
+            content += $"Generated on: {DateTime.Now:MMMM dd, yyyy HH:mm}\n";
 
             var bytes = System.Text.Encoding.UTF8.GetBytes(content);
             var fileName = $"TestResult_{result.TestName.Replace(" ", "_")}_{result.DatePerformed:yyyyMMdd}.txt";

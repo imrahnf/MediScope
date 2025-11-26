@@ -37,21 +37,25 @@ public class AccountController : Controller
         if (roles.Contains("Patient"))
         {
             return RedirectToAction("Index", "Patient");
-        } if (roles.Contains("Doctor"))
+        }
+        else if (roles.Contains("Doctor"))
         {
             return RedirectToAction("Index", "Doctor");
-        } if (roles.Contains("Admin"))
-        {
-            return RedirectToAction("Dashboard", "Admin");
         }
+        else if (roles.Contains("Admin"))
+        {
+            return RedirectToAction("Index", "Admin");
+        }
+        
         return RedirectToAction("Login", "Account");
     }
     
     // Logout
+    [AllowAnonymous]
     public async Task<IActionResult> Logout()
     {
         await _signInManager.SignOutAsync();
-        return RedirectToAction("Login");
+        return RedirectToAction("Login", "Account");
     }
     
     // Base Login Page
@@ -69,8 +73,9 @@ public class AccountController : Controller
                 if (roles.Contains("Doctor")) return RedirectToAction("Index", "Doctor");
                 if (roles.Contains("Admin")) return RedirectToAction("Index", "Admin");
             }
-            // Fallback
-            return RedirectToAction("Index", "Home");
+            // Fallback - redirect to login to avoid loops
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Login", "Account");
         }
         return View();
     }

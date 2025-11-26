@@ -24,6 +24,12 @@ namespace MediScope.Controllers
             _validator = validator;
         }
 
+        // LANDING PAGE
+        public IActionResult Index()
+        {
+            return View("Index");
+        }
+
         // DASHBOARD
         public async Task<IActionResult> Dashboard()
         {
