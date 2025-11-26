@@ -1,5 +1,6 @@
 using MediScope.Identity;
 using MediScope.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,6 +20,7 @@ public class AccountController : Controller
 
     // Sign In
     [HttpPost]
+    [AllowAnonymous]
     public async Task<IActionResult> Login(string username, string password)
     {
         var result = await _signInManager.PasswordSignInAsync(username, password, false, false);
@@ -35,6 +37,12 @@ public class AccountController : Controller
         if (roles.Contains("Patient"))
         {
             return RedirectToAction("Index", "Patient");
+        } else if (roles.Contains("Doctor"))
+        {
+            return RedirectToAction("Index", "Doctor");
+        } else if (roles.Contains("Admin"))
+        {
+            return RedirectToAction("Index", "Admin");
         }
         return RedirectToAction("Login", "Account");
     }
@@ -48,8 +56,22 @@ public class AccountController : Controller
     
     // Base Login Page
     [HttpGet]
-    public IActionResult Login()
+    [AllowAnonymous]
+    public async Task<IActionResult> Login()
     {
+        if (User?.Identity?.IsAuthenticated == true)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user != null)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                if (roles.Contains("Patient")) return RedirectToAction("Index", "Patient");
+                if (roles.Contains("Doctor")) return RedirectToAction("Index", "Doctor");
+                if (roles.Contains("Admin")) return RedirectToAction("Index", "Admin");
+            }
+            // Fallback
+            return RedirectToAction("Index", "Home");
+        }
         return View();
     }
 }

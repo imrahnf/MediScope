@@ -80,7 +80,7 @@ using (var scope = app.Services.CreateScope())
     context.Database.Migrate();
     
     // seed data
-    await SeedData.Initialize(services, context);
+    // await SeedData.Initialize(services, context);
 }
 
 app.Run();

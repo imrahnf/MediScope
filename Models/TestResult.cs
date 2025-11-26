@@ -9,5 +9,12 @@ public class TestResult
 
     // Relationships
     public int PatientId { get; set; }
+    public Patient Patient { get; set; } = null!;
+    
     public int DoctorId { get; set; }
+    public Doctor Doctor { get; set; } = null!;
+
+    // link to the appointment
+    public int? AppointmentId { get; set; }
+    public Appointment? Appointment { get; set; }
 }

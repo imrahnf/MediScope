@@ -13,4 +13,7 @@ public class Patient
     // FK to Identity
     public string? UserId { get; set; }
     public ApplicationUser? User { get; set; }
+
+    // Navigation properties
+    public List<TestResult> TestResults { get; set; } = new();
 }

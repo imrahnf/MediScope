@@ -17,6 +17,7 @@ else
             <th>Patient</th>
             <th>Date</th>
             <th>Status</th>
+            <th>Test Results</th>
             <th></th>
         </tr>
         </thead>
@@ -26,14 +27,74 @@ else
             <tr>
                 <td>@appt.Patient.Name</td>
                 <td>@appt.Date</td>
-                <td><span class="badge bg-primary">@appt.Status</span></td>
                 <td>
-                    <a asp-action="UploadTestResult"
-                       asp-route-appointmentId="@appt.Id"
-                       asp-route-patientId="@appt.PatientId"
-                       class="btn btn-sm btn-success">
-                        Upload Test Result
-                    </a>
+                    @{
+                        var badgeClass = appt.Status switch
+                        {
+                            "Scheduled" => "bg-warning",
+                            "Confirmed" => "bg-success",
+                            "Rejected" => "bg-danger",
+                            "Completed" => "bg-info",
+                            _ => "bg-primary"
+                        };
+                    }
+                    <span class="badge @badgeClass">@appt.Status</span>
+                </td>
+                <td>
+                    @{
+                        var resultsForAppt = appt.Patient.TestResults?.Where(tr => tr.AppointmentId == appt.Id).ToList();
+                    }
+                    @if (resultsForAppt != null && resultsForAppt.Any())
+                    {
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-info dropdown-toggle" type="button" id="testResults@(appt.Id)" data-bs-toggle="dropdown" aria-expanded="false">
+                                View Results (@resultsForAppt.Count)
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="testResults@(appt.Id)" style="min-width: 300px;">
+                                @foreach (var test in resultsForAppt)
+                                {
+                                    <li>
+                                        <a class="dropdown-item" asp-action="TestResultPage" asp-route-id="@test.Id">
+                                            <strong>@test.TestName</strong><br/>
+                                            <small class="text-muted">@test.DatePerformed.ToString("MM/dd/yyyy")</small>
+                                        </a>
+                                    </li>
+                                    @if (test != resultsForAppt.Last())
+                                    {
+                                        <li><hr class="dropdown-divider"/></li>
+                                    }
+                                }
+                            </ul>
+                        </div>
+                    }
+                    else
+                    {
+                        <span class="text-muted">No results</span>
+                    }
+                </td>
+                <td>
+                    <div class="d-flex gap-2">
+                        @if (appt.Status == "Scheduled")
+                        {
+                            <form asp-action="AcceptAppointment" method="post" class="d-inline">
+                                <input type="hidden" name="id" value="@appt.Id" />
+                                <button type="submit" class="btn btn-sm btn-success">Accept</button>
+                            </form>
+                            <form asp-action="RejectAppointment" method="post" class="d-inline">
+                                <input type="hidden" name="id" value="@appt.Id" />
+                                <button type="submit" class="btn btn-sm btn-danger">Reject</button>
+                            </form>
+                        }
+                        @if (appt.Status == "Confirmed")
+                        {
+                            <a asp-action="UploadTestResult"
+                               asp-route-appointmentId="@appt.Id"
+                               asp-route-patientId="@appt.PatientId"
+                               class="btn btn-sm btn-primary">
+                                Upload Test Result
+                            </a>
+                        }
+                    </div>
                 </td>
             </tr>
         }

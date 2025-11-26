@@ -57,5 +57,42 @@ namespace MediScope.Controllers
             await _feedbackService.SubmitFeedbackAsync(feedback);
             return RedirectToAction("Index");
         }
+
+        [HttpGet]
+        public async Task<IActionResult> TestResults()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var patient = await _context.Patients.FirstOrDefaultAsync(p => p.UserId == userId);
+            if (patient == null) return RedirectToAction("Login", "Account");
+
+            var results = await _context.TestResults
+                .Where(tr => tr.PatientId == patient.Id)
+                .Include(tr => tr.Doctor)
+                .OrderByDescending(tr => tr.DatePerformed)
+                .ToListAsync();
+
+            return View(results);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> TestResult(int id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var patient = await _context.Patients.FirstOrDefaultAsync(p => p.UserId == userId);
+            if (patient == null) return RedirectToAction("Login", "Account");
+
+            var result = await _context.TestResults
+                .Include(tr => tr.Doctor)
+                .Include(tr => tr.Appointment)
+                .FirstOrDefaultAsync(tr => tr.Id == id && tr.PatientId == patient.Id);
+
+            if (result == null)
+            {
+                TempData["Message"] = "Test result not found or does not belong to you.";
+                return RedirectToAction("TestResults");
+            }
+
+            return View("TestResult", result);
+        }
     }
 }
