@@ -1,0 +1,27 @@
+@model MediScope.Models.Doctor
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Edit Doctor";
+}
+
+<h2 class="fw-bold mb-4">Edit Doctor</h2>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+
+<form method="post" asp-action="EditDoctor" asp-route-id="@Model.Id">
+    <div class="mb-3">
+        <label>Name</label>
+        <input required class="form-control" name="name" value="@Model.Name" />
+    </div>
+
+    <div class="mb-3">
+        <label>Specialty</label>
+        <input required class="form-control" name="specialty" value="@Model.Specialty" />
+    </div>
+
+    <button class="btn btn-success">Save Changes</button>
+    <a asp-action="Doctors" class="btn btn-secondary">Cancel</a>
+</form>

@@ -1,0 +1,21 @@
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Add Department";
+}
+
+<h2 class="fw-bold mb-4">Add Department</h2>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+
+<form method="post" asp-action="Create">
+    <div class="mb-3">
+        <label>Department Name</label>
+        <input required class="form-control" name="name" />
+    </div>
+
+    <button class="btn btn-success">Save</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>

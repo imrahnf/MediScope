@@ -1,0 +1,32 @@
+@model IEnumerable<MediScope.Models.Feedback>
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Patient Feedback";
+}
+
+<h2 class="fw-bold mb-4">Patient Feedback</h2>
+
+<table class="table table-bordered table-hover shadow-sm">
+    <thead class="table-info">
+    <tr>
+        <th>Patient</th>
+        <th>Doctor</th>
+        <th>Rating</th>
+        <th>Message</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var f in Model)
+    {
+        <tr>
+            <td>@f.Patient?.Name</td>
+            <td>@f.Doctor?.Name</td>
+            <td>
+                <span class="badge bg-warning text-dark">@f.Rating ★</span>
+            </td>
+            <td>@f.Message</td>
+        </tr>
+    }
+    </tbody>
+</table>

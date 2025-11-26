@@ -39,14 +39,15 @@ namespace MediScope.Services
         }
 
         // ADMIN: Validate Department Creation 
-        public ValidationResult ValidateDepartment(string deptName)
+        public ValidationResult ValidateDepartment(string name)
         {
-            if (string.IsNullOrWhiteSpace(deptName))
+            if (string.IsNullOrWhiteSpace(name))
                 return ValidationResult.Fail("Department name cannot be empty.");
 
-            var exists = _context.Departments
-                .Any(d => d.Name.ToLower() == deptName.ToLower());
+            if (name.Length < 3)
+                return ValidationResult.Fail("Department name must be at least 3 characters.");
 
+            bool exists = _context.Departments.Any(d => d.Name.ToLower() == name.ToLower());
             if (exists)
                 return ValidationResult.Fail("A department with this name already exists.");
 
