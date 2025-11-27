@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using MediScope.Models;
 using MediScope.Repositories;
 using MediScope.Services;
@@ -13,15 +12,18 @@ namespace MediScope.Controllers
         private readonly MediScopeContext _context;
         private readonly DepartmentRepository _repo;
         private readonly ValidationService _validator;
+        private readonly LoggingService _logging;
 
         public DepartmentController(
             MediScopeContext context,
             DepartmentRepository repo,
-            ValidationService validator)
+            ValidationService validator,
+            LoggingService logging)
         {
             _context = context;
             _repo = repo;
             _validator = validator;
+            _logging = logging;
         }
 
         // LIST
@@ -52,6 +54,8 @@ namespace MediScope.Controllers
             await _repo.Add(department);
             await _repo.Save();
 
+            await _logging.AddAsync($"Admin created department (id={department.Id}, name={department.Name})");
+
             return RedirectToAction("Index");
         }
 
@@ -80,6 +84,8 @@ namespace MediScope.Controllers
 
             dept.Name = name;
             await _repo.Save();
+
+            await _logging.AddAsync($"Admin edited department (id={dept.Id}, name={dept.Name})");
             return RedirectToAction("Index");
         }
 
@@ -92,6 +98,8 @@ namespace MediScope.Controllers
 
             _repo.Delete(dept);
             await _repo.Save();
+
+            await _logging.AddAsync($"Admin deleted department (id={dept.Id}, name={dept.Name})");
 
             return RedirectToAction("Index");
         }

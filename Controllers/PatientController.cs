@@ -14,12 +14,14 @@ namespace MediScope.Controllers
         private readonly AppointmentService _appointmentService;
         private readonly MediScopeContext _context;
         private readonly FeedbackService _feedbackService;
+        private readonly LoggingService _logging;
 
-        public PatientController(AppointmentService appointmentService, MediScopeContext context, FeedbackService feedbackService)
+        public PatientController(AppointmentService appointmentService, MediScopeContext context, FeedbackService feedbackService, LoggingService logging)
         {
             _appointmentService = appointmentService;
             _context = context;
             _feedbackService = feedbackService;
+            _logging = logging;
         }
 
         public async Task<IActionResult> Index()
@@ -97,6 +99,9 @@ namespace MediScope.Controllers
 
             await _feedbackService.SubmitFeedbackAsync(feedback);
 
+            // Log the action
+            await _logging.AddAsync($"Patient (id={patient.Id}) gave doctor (id={doctorId}) feedback");
+
             TempData["Message"] = "Thank you. Your feedback was submitted.";
             return RedirectToAction("Feedback");
         }
@@ -171,7 +176,10 @@ namespace MediScope.Controllers
             var bytes = System.Text.Encoding.UTF8.GetBytes(content);
             var fileName = $"TestResult_{result.TestName.Replace(" ", "_")}_{result.DatePerformed:yyyyMMdd}.txt";
             
+            // Log the download
+            await _logging.AddAsync($"Patient (id={patient.Id}) downloaded test result (id={result.Id})");
+
             return File(bytes, "text/plain", fileName);
-        }
-    }
-}
+         }
+     }
+ }

@@ -13,15 +13,18 @@ namespace MediScope.Controllers
         private readonly MediScopeContext _context;
         private readonly AnalyticsService _analytics;
         private readonly ValidationService _validator;
+        private readonly LoggingService _logging = null!;
 
         public AdminController(
             MediScopeContext context,
             AnalyticsService analytics,
-            ValidationService validator)
+            ValidationService validator,
+            LoggingService logging)
         {
             _context = context;
             _analytics = analytics;
             _validator = validator;
+            _logging = logging;
         }
 
         // LANDING PAGE
@@ -80,6 +83,8 @@ namespace MediScope.Controllers
             _context.Doctors.Add(doctor);
             await _context.SaveChangesAsync();
 
+            await _logging.AddAsync($"Admin created doctor (name={name}, id={doctor.Id})");
+
             return RedirectToAction("Doctors");
         }
 
@@ -112,6 +117,7 @@ namespace MediScope.Controllers
             doctor.DepartmentId = departmentId;
 
             await _context.SaveChangesAsync();
+            await _logging.AddAsync($"Admin edited doctor (id={id}, name={name})");
             return RedirectToAction("Doctors");
         }
 
@@ -124,6 +130,8 @@ namespace MediScope.Controllers
             _context.Doctors.Remove(doctor);
             await _context.SaveChangesAsync();
 
+            await _logging.AddAsync($"Admin deleted doctor (id={id}, name={doctor.Name})");
+
             return RedirectToAction("Doctors");
         } 
         // FEEDBACK REVIEW
@@ -134,6 +142,7 @@ namespace MediScope.Controllers
                 .Include(f => f.Patient)
                 .ToListAsync();
 
+            await _logging.AddAsync($"Admin accessed feedback review (count={feedback.Count})");
             return View("Feedback", feedback);
         }
 

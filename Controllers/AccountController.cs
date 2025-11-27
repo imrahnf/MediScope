@@ -11,11 +11,13 @@ public class AccountController : Controller
 {
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly LoggingService _logging;
     
-    public AccountController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager)
+    public AccountController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, LoggingService logging)
     {
         _signInManager = signInManager;
         _userManager = userManager;
+        _logging = logging;
     }
 
     // Sign In
@@ -32,6 +34,8 @@ public class AccountController : Controller
             return View();
         }
 
+        // log successful login
+        await _logging.AddAsync($"User '{username}' signed in");
         var user = await _userManager.FindByNameAsync(username);
         var roles = await _userManager.GetRolesAsync(user);
 
@@ -56,6 +60,11 @@ public class AccountController : Controller
     [AllowAnonymous]
     public async Task<IActionResult> Logout()
     {
+        // attempt to identify the user who is logging out
+        var user = await _userManager.GetUserAsync(User);
+        var uname = user?.UserName ?? "Unknown";
+        await _logging.AddAsync($"User '{uname}' logged out");
+
         await _signInManager.SignOutAsync();
         return RedirectToAction("Login", "Account");
     }
