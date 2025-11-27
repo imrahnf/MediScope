@@ -36,6 +36,11 @@ namespace MediScope.Controllers
         [HttpGet]
         public async Task<IActionResult> Feedback()
         {
+            // Provide list of doctors for the feedback form
+            var doctors = await _context.Doctors.ToListAsync();
+            ViewData["Doctors"] = doctors;
+
+            // show any success message from previous submission
             return View();
         }
 
@@ -45,6 +50,42 @@ namespace MediScope.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var patient = await _context.Patients.FirstOrDefaultAsync(p => p.UserId == userId);
             if (patient == null) return RedirectToAction("Index");
+            
+            var doctor = await _context.Doctors.FindAsync(doctorId);
+            if (doctor == null)
+            {
+                ModelState.AddModelError("doctorId", "Selected doctor does not exist.");
+            }
+
+            if (rating < 1 || rating > 5)
+            {
+                ModelState.AddModelError("rating", "Rating must be between 1 and 5.");
+            }
+
+            if (string.IsNullOrWhiteSpace(message))
+            {
+                ModelState.AddModelError("message", "Please enter your feedback message.");
+            }
+            else if (message.Length > 1000)
+            {
+                ModelState.AddModelError("message", "Message must be 1000 characters or fewer.");
+            }
+
+            // prevent more than one feedback per patient->doctor
+            if (doctor != null)
+            {
+                var already = await _feedbackService.HasPatientSubmittedFeedbackAsync(patient.Id, doctorId);
+                if (already)
+                {
+                    ModelState.AddModelError(string.Empty, "You have already submitted feedback for this doctor.");
+                }
+            }
+
+            if (!ModelState.IsValid)
+            {
+                ViewData["Doctors"] = await _context.Doctors.ToListAsync();
+                return View();
+            }
 
             var feedback = new Feedback
             {
@@ -55,7 +96,9 @@ namespace MediScope.Controllers
             };
 
             await _feedbackService.SubmitFeedbackAsync(feedback);
-            return RedirectToAction("Index");
+
+            TempData["Message"] = "Thank you. Your feedback was submitted.";
+            return RedirectToAction("Feedback");
         }
 
         [HttpGet]
