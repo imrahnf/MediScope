@@ -1,0 +1,44 @@
+@model IEnumerable<MediScope.Models.Log>
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "System Logs";
+    var q = ViewData["Query"] as string ?? "";
+    var take = ViewData["Take"] as int? ?? 200;
+}
+
+<h2 class="fw-bold mb-4">System Logs</h2>
+
+<div class="d-flex mb-3">
+    <form class="d-flex me-2" method="get" asp-action="Logs">
+        <input name="q" value="@q" class="form-control me-2" placeholder="Search logs..." />
+        <input name="take" value="@take" type="hidden" />
+        <button class="btn btn-outline-primary" type="submit">Search</button>
+    </form>
+
+    <form method="post" asp-action="ClearLogs" onsubmit="return confirm('Are you sure you want to clear all logs? This cannot be undone.');">
+        @Html.AntiForgeryToken()
+        <button class="btn btn-danger">Clear Logs</button>
+    </form>
+</div>
+
+<p class="text-muted">Showing recent activity (most recent first). Found @Model.Count() entries.</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Time (UTC)</th>
+            <th>Message</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach(var log in Model)
+    {
+        <tr>
+            <td>@log.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")</td>
+            <td>@log.Description</td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<a asp-action="Dashboard" class="btn btn-secondary">Back to Dashboard</a>

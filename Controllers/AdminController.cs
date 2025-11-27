@@ -158,5 +158,39 @@ namespace MediScope.Controllers
             // Will be implemented when we create Department model
             return View("Departments");
         }
+        
+        public async Task<IActionResult> Logs(string? q = null, int take = 200)
+        {
+            // basic search by description (case-insensitive)
+            var query = _context.Logs.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(q))
+            {
+                query = query.Where(l => l.Description.ToLower().Contains(q.ToLower()));
+                ViewData["Query"] = q;
+            }
+
+            var logs = await query
+                .OrderByDescending(l => l.CreatedAt)
+                .Take(take)
+                .ToListAsync();
+
+            ViewData["Take"] = take;
+            return View("Logs", logs);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ClearLogs()
+        {
+            // capture a note for audit
+            var admin = User?.Identity?.Name ?? "Admin";
+            _context.Logs.RemoveRange(_context.Logs);
+            await _context.SaveChangesAsync();
+            
+            await _logging.AddAsync($"Admin '{admin}' cleared all logs");
+
+            return RedirectToAction("Logs");
+        }
     }
 }
+
