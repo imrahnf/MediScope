@@ -6,16 +6,16 @@
 
 ---
 
-## 📋 Table of Contents
-- [MediScope 🏥](#mediscope-)
-  - [📋 Table of Contents](#-table-of-contents)
-  - [🔍 Overview](#-overview)
+## Table of Contents
+- [MediScope](#mediscope-)
+  - [Table of Contents](#-table-of-contents)
+  - [Overview](#-overview)
   - [Features](#features)
     - [Administrators](#administrators)
     - [Doctors](#doctors)
     - [Patients](#patients)
     - [Core System Features](#core-system-features)
-  - [🛠 Technology Stack](#-technology-stack)
+  - [Technology Stack](#-technology-stack)
     - [Backend](#backend)
     - [Frontend](#frontend)
     - [Architecture Patterns](#architecture-patterns)
@@ -43,7 +43,7 @@
 
 ---
 
-## 🔍 Overview
+## Overview
 
 MediScope is a modern, full-featured healthcare management system built with ASP.NET Core MVC and Entity Framework Core. The application provides comprehensive tools for managing medical appointments, patient records, doctor schedules, departments, and resources in a healthcare facility.
 
