@@ -12,11 +12,13 @@ namespace MediScope.Controllers
     {
         private readonly MediScopeContext _context;
         private readonly AppointmentService _appointmentService;
+        private readonly LoggingService _logging;
 
-        public AppointmentController(MediScopeContext context, AppointmentService appointmentService)
+        public AppointmentController(MediScopeContext context, AppointmentService appointmentService, LoggingService logging)
         {
             _context = context;
             _appointmentService = appointmentService;
+            _logging = logging;
         }
 
         [HttpGet]
@@ -42,6 +44,9 @@ namespace MediScope.Controllers
                 return RedirectToAction("Book");
             }
 
+            // Log the booking
+            await _logging.AddAsync($"Patient (id={patient.Id}) booked appointment with doctor (id={doctorId}) on {dateTime:O}");
+
             return RedirectToAction("Index", "Patient");
         }
 
@@ -54,6 +59,9 @@ namespace MediScope.Controllers
 
             var ok = await _appointmentService.CancelAppointmentAsync(appointmentId, patient.Id);
             if (!ok) return BadRequest();
+
+            // Log the cancellation
+            await _logging.AddAsync($"Patient (id={patient.Id}) canceled appointment (id={appointmentId})");
 
             return RedirectToAction("Index", "Patient");
         }

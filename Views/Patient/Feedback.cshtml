@@ -1,0 +1,68 @@
+@using MediScope.Models
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Submit Feedback";
+    var doctors = ViewData["Doctors"] as IEnumerable<Doctor> ?? Enumerable.Empty<Doctor>();
+    var successMessage = TempData["Message"] as string;
+}
+
+<h2 class="fw-bold mb-4">Submit Feedback for a Doctor</h2>
+
+@if (!string.IsNullOrEmpty(successMessage))
+{
+    <div class="alert alert-success">@successMessage</div>
+}
+
+<form asp-action="Feedback" method="post">
+    <div class="mb-3">
+        <label for="doctorId" class="form-label">Doctor</label>
+        <select class="form-select" id="doctorId" name="doctorId">
+            <option value="">-- Select a doctor --</option>
+            @foreach (var d in doctors)
+            {
+                <option value="@d.Id">@d.Name (@d.Specialty)</option>
+            }
+        </select>
+        @if (ViewData.ModelState.TryGetValue("doctorId", out var docState) && docState.Errors.Count > 0)
+        {
+            <div class="text-danger">@docState.Errors[0].ErrorMessage</div>
+        }
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Rating</label>
+        <div>
+            @for (int i = 1; i <= 5; i++)
+            {
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="rating" id="rating@i" value="@i" />
+                    <label class="form-check-label" for="rating@i">@i ★</label>
+                </div>
+            }
+        </div>
+        @if (ViewData.ModelState.TryGetValue("rating", out var ratingState) && ratingState.Errors.Count > 0)
+        {
+            <div class="text-danger">@ratingState.Errors[0].ErrorMessage</div>
+        }
+    </div>
+
+    <div class="mb-3">
+        <label for="message" class="form-label">Message</label>
+        <textarea class="form-control" id="message" name="message" rows="5" maxlength="1000"></textarea>
+        <div class="form-text">Maximum 1000 characters.</div>
+        @if (ViewData.ModelState.TryGetValue("message", out var msgState) && msgState.Errors.Count > 0)
+        {
+            <div class="text-danger">@msgState.Errors[0].ErrorMessage</div>
+        }
+    </div>
+
+    @if (ViewData.ModelState.TryGetValue(string.Empty, out var formState) && formState.Errors.Count > 0)
+    {
+        <div class="mb-3 text-danger">@formState.Errors[0].ErrorMessage</div>
+    }
+
+    <div class="mb-3">
+        <button type="submit" class="btn btn-primary">Submit Feedback</button>
+        <a asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
+    </div>
+</form>

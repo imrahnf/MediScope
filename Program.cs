@@ -26,6 +26,7 @@ builder.Services.AddScoped<AppointmentService>();
 builder.Services.AddScoped<AnalyticsService>();
 builder.Services.AddScoped<FeedbackService>();
 builder.Services.AddScoped<ValidationService>();
+builder.Services.AddScoped<LoggingService>();
 
 // Sessions
 builder.Services.AddDistributedMemoryCache();

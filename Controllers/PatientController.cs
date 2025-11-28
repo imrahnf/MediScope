@@ -14,12 +14,14 @@ namespace MediScope.Controllers
         private readonly AppointmentService _appointmentService;
         private readonly MediScopeContext _context;
         private readonly FeedbackService _feedbackService;
+        private readonly LoggingService _logging;
 
-        public PatientController(AppointmentService appointmentService, MediScopeContext context, FeedbackService feedbackService)
+        public PatientController(AppointmentService appointmentService, MediScopeContext context, FeedbackService feedbackService, LoggingService logging)
         {
             _appointmentService = appointmentService;
             _context = context;
             _feedbackService = feedbackService;
+            _logging = logging;
         }
 
         public async Task<IActionResult> Index()
@@ -36,6 +38,11 @@ namespace MediScope.Controllers
         [HttpGet]
         public async Task<IActionResult> Feedback()
         {
+            // Provide list of doctors for the feedback form
+            var doctors = await _context.Doctors.ToListAsync();
+            ViewData["Doctors"] = doctors;
+
+            // show any success message from previous submission
             return View();
         }
 
@@ -45,6 +52,42 @@ namespace MediScope.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var patient = await _context.Patients.FirstOrDefaultAsync(p => p.UserId == userId);
             if (patient == null) return RedirectToAction("Index");
+            
+            var doctor = await _context.Doctors.FindAsync(doctorId);
+            if (doctor == null)
+            {
+                ModelState.AddModelError("doctorId", "Selected doctor does not exist.");
+            }
+
+            if (rating < 1 || rating > 5)
+            {
+                ModelState.AddModelError("rating", "Rating must be between 1 and 5.");
+            }
+
+            if (string.IsNullOrWhiteSpace(message))
+            {
+                ModelState.AddModelError("message", "Please enter your feedback message.");
+            }
+            else if (message.Length > 1000)
+            {
+                ModelState.AddModelError("message", "Message must be 1000 characters or fewer.");
+            }
+
+            // prevent more than one feedback per patient->doctor
+            if (doctor != null)
+            {
+                var already = await _feedbackService.HasPatientSubmittedFeedbackAsync(patient.Id, doctorId);
+                if (already)
+                {
+                    ModelState.AddModelError(string.Empty, "You have already submitted feedback for this doctor.");
+                }
+            }
+
+            if (!ModelState.IsValid)
+            {
+                ViewData["Doctors"] = await _context.Doctors.ToListAsync();
+                return View();
+            }
 
             var feedback = new Feedback
             {
@@ -55,7 +98,12 @@ namespace MediScope.Controllers
             };
 
             await _feedbackService.SubmitFeedbackAsync(feedback);
-            return RedirectToAction("Index");
+
+            // Log the action
+            await _logging.AddAsync($"Patient (id={patient.Id}) gave doctor (id={doctorId}) feedback");
+
+            TempData["Message"] = "Thank you. Your feedback was submitted.";
+            return RedirectToAction("Feedback");
         }
 
         [HttpGet]
@@ -128,7 +176,10 @@ namespace MediScope.Controllers
             var bytes = System.Text.Encoding.UTF8.GetBytes(content);
             var fileName = $"TestResult_{result.TestName.Replace(" ", "_")}_{result.DatePerformed:yyyyMMdd}.txt";
             
+            // Log the download
+            await _logging.AddAsync($"Patient (id={patient.Id}) downloaded test result (id={result.Id})");
+
             return File(bytes, "text/plain", fileName);
-        }
-    }
-}
+         }
+     }
+ }

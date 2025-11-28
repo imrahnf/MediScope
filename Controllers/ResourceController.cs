@@ -12,11 +12,13 @@ namespace MediScope.Controllers
     {
         private readonly ResourceRepository _repo;
         private readonly ValidationService _validator;
+        private readonly LoggingService _logging;
 
-        public ResourceController(ResourceRepository repo, ValidationService validator)
+        public ResourceController(ResourceRepository repo, ValidationService validator, LoggingService logging)
         {
             _repo = repo;
             _validator = validator;
+            _logging = logging;
         }
         // LIST
         public async Task<IActionResult> Index()
@@ -51,6 +53,8 @@ namespace MediScope.Controllers
             await _repo.Add(res);
             await _repo.Save();
 
+            await _logging.AddAsync($"Admin created resource (id={res.Id}, name={res.Name})");
+
             return RedirectToAction("Index");
         }
         // EDIT
@@ -81,6 +85,8 @@ namespace MediScope.Controllers
             res.Quantity = quantity;
 
             await _repo.Save();
+
+            await _logging.AddAsync($"Admin edited resource (id={res.Id}, name={res.Name})");
             return RedirectToAction("Index");
         }
         // DELETE
@@ -92,6 +98,8 @@ namespace MediScope.Controllers
 
             _repo.Delete(res);
             await _repo.Save();
+
+            await _logging.AddAsync($"Admin deleted resource (id={res.Id}, name={res.Name})");
 
             return RedirectToAction("Index");
         }

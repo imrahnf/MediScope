@@ -13,15 +13,18 @@ namespace MediScope.Controllers
         private readonly MediScopeContext _context;
         private readonly AnalyticsService _analytics;
         private readonly ValidationService _validator;
+        private readonly LoggingService _logging = null!;
 
         public AdminController(
             MediScopeContext context,
             AnalyticsService analytics,
-            ValidationService validator)
+            ValidationService validator,
+            LoggingService logging)
         {
             _context = context;
             _analytics = analytics;
             _validator = validator;
+            _logging = logging;
         }
 
         // LANDING PAGE
@@ -80,6 +83,8 @@ namespace MediScope.Controllers
             _context.Doctors.Add(doctor);
             await _context.SaveChangesAsync();
 
+            await _logging.AddAsync($"Admin created doctor (name={name}, id={doctor.Id})");
+
             return RedirectToAction("Doctors");
         }
 
@@ -112,6 +117,7 @@ namespace MediScope.Controllers
             doctor.DepartmentId = departmentId;
 
             await _context.SaveChangesAsync();
+            await _logging.AddAsync($"Admin edited doctor (id={id}, name={name})");
             return RedirectToAction("Doctors");
         }
 
@@ -124,6 +130,8 @@ namespace MediScope.Controllers
             _context.Doctors.Remove(doctor);
             await _context.SaveChangesAsync();
 
+            await _logging.AddAsync($"Admin deleted doctor (id={id}, name={doctor.Name})");
+
             return RedirectToAction("Doctors");
         } 
         // FEEDBACK REVIEW
@@ -134,6 +142,7 @@ namespace MediScope.Controllers
                 .Include(f => f.Patient)
                 .ToListAsync();
 
+            await _logging.AddAsync($"Admin accessed feedback review (count={feedback.Count})");
             return View("Feedback", feedback);
         }
 
@@ -149,5 +158,39 @@ namespace MediScope.Controllers
             // Will be implemented when we create Department model
             return View("Departments");
         }
+        
+        public async Task<IActionResult> Logs(string? q = null, int take = 200)
+        {
+            // basic search by description (case-insensitive)
+            var query = _context.Logs.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(q))
+            {
+                query = query.Where(l => l.Description.ToLower().Contains(q.ToLower()));
+                ViewData["Query"] = q;
+            }
+
+            var logs = await query
+                .OrderByDescending(l => l.CreatedAt)
+                .Take(take)
+                .ToListAsync();
+
+            ViewData["Take"] = take;
+            return View("Logs", logs);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ClearLogs()
+        {
+            // capture a note for audit
+            var admin = User?.Identity?.Name ?? "Admin";
+            _context.Logs.RemoveRange(_context.Logs);
+            await _context.SaveChangesAsync();
+            
+            await _logging.AddAsync($"Admin '{admin}' cleared all logs");
+
+            return RedirectToAction("Logs");
+        }
     }
 }
+

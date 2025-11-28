@@ -23,5 +23,10 @@ namespace MediScope.Services
 
         public async Task<IEnumerable<Feedback>> GetFeedbacksForDoctorAsync(int doctorId) =>
             await _context.Feedbacks.Where(f => f.DoctorId == doctorId).ToListAsync();
+
+        public async Task<bool> HasPatientSubmittedFeedbackAsync(int patientId, int doctorId)
+        {
+            return await _context.Feedbacks.AnyAsync(f => f.PatientId == patientId && f.DoctorId == doctorId);
+        }
     }
 }
