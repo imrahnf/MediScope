@@ -1,7 +1,23 @@
+/**************************************************************************
+ * File: ValidationService.cs
+ * Author: Maryam Elhamidi
+ *
+ * Description:
+ *     Provides all admin-facing validation logic for department creation,
+ *     resource management, doctor creation, feedback validation, and
+ *     structural workflow rules to protect database integrity.
+ *
+ * Last Modified: Nov 26, 2025
+ **************************************************************************/
+
 using MediScope.Models;
 
 namespace MediScope.Services
 {
+    /// <summary>
+    /// Represents the result of a validation operation.
+    /// Used across admin features.
+    /// </summary>
     public class ValidationResult
     {
         public bool Success { get; set; }
@@ -11,6 +27,11 @@ namespace MediScope.Services
         public static ValidationResult Fail(string msg) => new ValidationResult { Success = false, Message = msg };
     }
 
+    /// <summary>
+    /// Contains all validation rules used by the Admin module.
+    /// Includes rules for resources, departments, doctors, feedback, and
+    /// deletion safety checks.
+    /// </summary>
     public class ValidationService
     {
         private readonly MediScopeContext _context;
@@ -20,7 +41,9 @@ namespace MediScope.Services
             _context = context;
         }
 
-        // ADMIN: Validate Creating/Updating a Doctor
+        /// <summary>
+        /// Ensures doctor name and specialty fields are valid.
+        /// </summary>
         public ValidationResult ValidateDoctorCreation(string name, string specialty)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -38,7 +61,9 @@ namespace MediScope.Services
             return ValidationResult.Ok();
         }
 
-        // ADMIN: Validate Department Creation 
+        /// <summary>
+        /// Ensures department names adhere to structure and uniqueness.
+        /// </summary>
         public ValidationResult ValidateDepartment(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -54,7 +79,9 @@ namespace MediScope.Services
             return ValidationResult.Ok();
         }
 
-        // ADMIN: Validate Resource Creation 
+        /// <summary>
+        /// Ensures resources contain valid data (non-negative quantities, names, etc).
+        /// </summary>
         public ValidationResult ValidateResource(string name, string type, int quantity)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -69,7 +96,9 @@ namespace MediScope.Services
             return ValidationResult.Ok();
         }
 
-        // Prevent Duplicate Resource Name
+        /// <summary>
+        /// Prevents duplicate resource names.
+        /// </summary>
         public ValidationResult ValidateUniqueResourceName(string name)
         {
             bool exists = _context.Resources.Any(r => r.Name.ToLower() == name.ToLower());
@@ -80,7 +109,9 @@ namespace MediScope.Services
             return ValidationResult.Ok();
         }
 
-        // Validate Doctor-to-Department assignment (used in Phase 7)
+        /// <summary>
+        /// Ensures referenced departments exist (for doctor assignment).
+        /// </summary>
         public ValidationResult ValidateDepartmentExists(int departmentId)
         {
             bool exists = _context.Departments.Any(d => d.Id == departmentId);
@@ -90,11 +121,13 @@ namespace MediScope.Services
                 : ValidationResult.Fail("Selected department does not exist.");
         }
 
-        // Prevent deleting departments with assigned doctors
+        /// <summary>
+        /// Prevents deletion of departments that still have assigned doctors.
+        /// </summary>
         public ValidationResult ValidateDepartmentDeletion(int departmentId)
         {
             bool hasDoctors = _context.Doctors.Any(d => d.Specialty == departmentId.ToString());
-            // NOTE: Once doctor–department relationship is added, change this condition.
+            // NOTE: Replace with actual department relationship when enforced.
 
             if (hasDoctors)
                 return ValidationResult.Fail("Cannot delete department — doctors are assigned to it.");
@@ -102,7 +135,9 @@ namespace MediScope.Services
             return ValidationResult.Ok();
         }
 
-        // Validate feedback messages -- not using unless imrahn wanna use it 
+        /// <summary>
+        /// Validates feedback message length and rating bounds.
+        /// </summary>
         public ValidationResult ValidateFeedback(string message, int rating)
         {
             if (string.IsNullOrWhiteSpace(message))
