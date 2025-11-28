@@ -1,8 +1,22 @@
+/**************************************************************************
+ * File: DoctorRepository.cs
+ * Author: Maryam Elhamidi
+ *
+ * Description:
+ *     Custom repository for doctor-specific data access.
+ *     Includes Identity-linked doctor lookup and doctor–patient relations.
+ *
+ * Last Modified: Nov 26, 2025
+ **************************************************************************/
+
 using MediScope.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace MediScope.Repositories
 {
+    /// <summary>
+    /// Provides doctor-related queries beyond basic CRUD.
+    /// </summary>
     public class DoctorRepository : Repository<Doctor>
     {
         private readonly MediScopeContext _context;
@@ -12,7 +26,10 @@ namespace MediScope.Repositories
             _context = context;
         }
 
-        // Get doctor by UserId (Identity link)
+        /// <summary>
+        /// Retrieves a doctor based on their ASP.NET Identity UserId.
+        /// Used for matching logged-in doctors to their profile.
+        /// </summary>
         public async Task<Doctor?> GetByUserIdAsync(string userId)
         {
             return await _context.Doctors
@@ -20,7 +37,9 @@ namespace MediScope.Repositories
                 .FirstOrDefaultAsync(d => d.UserId == userId);
         }
 
-        // Get doctor + all patients they saw
+        /// <summary>
+        /// Returns all unique patients who have had appointments with a doctor.
+        /// </summary>
         public async Task<IEnumerable<Patient>> GetPatientsForDoctorAsync(int doctorId)
         {
             var patientIds = await _context.Appointments
@@ -34,7 +53,9 @@ namespace MediScope.Repositories
                 .ToListAsync();
         }
 
-        // Get doctor appointment count
+        /// <summary>
+        /// Returns total number of appointments a doctor has.
+        /// </summary>
         public async Task<int> GetAppointmentCountAsync(int doctorId)
         {
             return await _context.Appointments
