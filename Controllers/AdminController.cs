@@ -1,3 +1,25 @@
+/**************************************************************************
+ * File: AdminController.cs
+ * Author: Maryam Elhamidi & Omrahn
+ * Description:
+ *     Handles all administrative UI logic for the MediScope system including:
+ *         - Dashboard analytics
+ *         - Doctor management (CRUD)
+ *         - Patient feedback review
+ *         - Department & resource placeholders
+ *         - Admin system logs
+ * 
+ *     This controller works closely with:
+ *         - AnalyticsService (charts + KPIs)
+ *         - ValidationService (business rule validation)
+ *         - LoggingService (admin audit trail)
+ *         - MediScopeContext (database access)
+ *
+ *     All actions require an Admin role.
+ *
+ * Last Modified: Nov 26, 2025
+ **************************************************************************/
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -7,14 +29,21 @@ using MediScope.Models.ViewModels;
 
 namespace MediScope.Controllers
 {
+    /// <summary>
+    /// Maryam - MVC controller that manages all admin-side features such as dashboards,
+    /// doctor management, feedback moderation, and system logs.
+    /// </summary>
     [Authorize(Roles = "Admin")]
     public class AdminController : Controller
     {
         private readonly MediScopeContext _context;
         private readonly AnalyticsService _analytics;
         private readonly ValidationService _validator;
-        private readonly LoggingService _logging = null!;
+        private readonly LoggingService _logging;
 
+        /// <summary>
+        /// Maryam - Injects database, analytics, validation, and logging services.
+        /// </summary>
         public AdminController(
             MediScopeContext context,
             AnalyticsService analytics,
@@ -27,13 +56,26 @@ namespace MediScope.Controllers
             _logging = logging;
         }
 
-        // LANDING PAGE
+        // --------------------------------------------------------------------
+        //  LANDING PAGE
+        // --------------------------------------------------------------------
+
+        /// <summary>
+        /// Omrahn - Displays the admin landing page.
+        /// </summary>
         public IActionResult Index()
         {
             return View("Index");
         }
 
-        // DASHBOARD
+        // --------------------------------------------------------------------
+        //  ADMIN DASHBOARD
+        // --------------------------------------------------------------------
+
+        /// <summary>
+        /// Maryam - Loads the Admin Dashboard with total counts, recent analytics,
+        /// and average feedback rating. All chart requests are handled through AJAX.
+        /// </summary>
         public async Task<IActionResult> Dashboard()
         {
             var model = new AdminDashboardViewModel
@@ -47,13 +89,23 @@ namespace MediScope.Controllers
             return View("Dashboard", model);
         }
 
-        // DOCTOR MANAGEMENT
+        // --------------------------------------------------------------------
+        //  DOCTOR MANAGEMENT
+        // --------------------------------------------------------------------
+
+        /// <summary>
+        /// Maryam - Displays a list of all doctors in the system.
+        /// </summary>
         public async Task<IActionResult> Doctors()
         {
             var doctors = await _context.Doctors.ToListAsync();
             return View("Doctors", doctors);
         }
 
+        /// <summary>
+        /// Maryam - Shows the "Create Doctor" form.
+        /// Departments are loaded for dropdown selection.
+        /// </summary>
         [HttpGet]
         public async Task<IActionResult> CreateDoctor()
         {
@@ -61,11 +113,14 @@ namespace MediScope.Controllers
             return View("CreateDoctor");
         }
 
-
+        /// <summary>
+        /// Maryam - Creates a new doctor after validating the input.
+        /// </summary>
         [HttpPost]
         public async Task<IActionResult> CreateDoctor(string name, string specialty, int departmentId)
         {
             var validation = _validator.ValidateDoctorCreation(name, specialty);
+
             if (!validation.Success)
             {
                 ViewBag.Error = validation.Message;
@@ -88,6 +143,9 @@ namespace MediScope.Controllers
             return RedirectToAction("Doctors");
         }
 
+        /// <summary>
+        /// Maryam - Loads the edit page for a specific doctor.
+        /// </summary>
         [HttpGet]
         public async Task<IActionResult> EditDoctor(int id)
         {
@@ -98,6 +156,9 @@ namespace MediScope.Controllers
             return View("EditDoctor", doctor);
         }
 
+        /// <summary>
+        /// Maryam - Updates an existing doctor after validation.
+        /// </summary>
         [HttpPost]
         public async Task<IActionResult> EditDoctor(int id, string name, string specialty, int departmentId)
         {
@@ -105,6 +166,7 @@ namespace MediScope.Controllers
             if (doctor == null) return NotFound();
 
             var validation = _validator.ValidateDoctorCreation(name, specialty);
+
             if (!validation.Success)
             {
                 ViewBag.Error = validation.Message;
@@ -118,9 +180,14 @@ namespace MediScope.Controllers
 
             await _context.SaveChangesAsync();
             await _logging.AddAsync($"Admin edited doctor (id={id}, name={name})");
+
             return RedirectToAction("Doctors");
         }
 
+        /// <summary>
+        /// Maryam - Deletes a doctor from the system.
+        /// Logs the deletion for accountability.
+        /// </summary>
         [HttpPost]
         public async Task<IActionResult> DeleteDoctor(int id)
         {
@@ -133,8 +200,15 @@ namespace MediScope.Controllers
             await _logging.AddAsync($"Admin deleted doctor (id={id}, name={doctor.Name})");
 
             return RedirectToAction("Doctors");
-        } 
-        // FEEDBACK REVIEW
+        }
+
+        // --------------------------------------------------------------------
+        //  PATIENT FEEDBACK MANAGEMENT
+        // --------------------------------------------------------------------
+
+        /// <summary>
+        /// Maryam - Retrieves all feedback entries for admin review, including doctor & patient info.
+        /// </summary>
         public async Task<IActionResult> Feedback()
         {
             var feedback = await _context.Feedbacks
@@ -143,26 +217,42 @@ namespace MediScope.Controllers
                 .ToListAsync();
 
             await _logging.AddAsync($"Admin accessed feedback review (count={feedback.Count})");
+
             return View("Feedback", feedback);
         }
 
-        // PLACEHOLDER: RESOURCE MANAGEMENT
+        // --------------------------------------------------------------------
+        //  PLACEHOLDERS FOR FUTURE MODULES
+        // --------------------------------------------------------------------
+
+        /// <summary>
+        /// Maryam -Placeholder page for the resource management module.
+        /// </summary>
         public IActionResult Resources()
         {
             return View("Resources");
         }
 
-        // PLACEHOLDER: DEPARTMENT MANAGEMENT
+        /// <summary>
+        /// Maryam - Placeholder page for the department management module.
+        /// </summary>
         public IActionResult Departments()
         {
-            // Will be implemented when we create Department model
             return View("Departments");
         }
-        
+
+        // --------------------------------------------------------------------
+        //  SYSTEM LOGS
+        // --------------------------------------------------------------------
+
+        /// <summary>
+        /// Omrahn - Shows the application logs with optional search and filtering.
+        /// </summary>
         public async Task<IActionResult> Logs(string? q = null, int take = 200)
         {
-            // basic search by description (case-insensitive)
             var query = _context.Logs.AsQueryable();
+
+            // optional search filter
             if (!string.IsNullOrWhiteSpace(q))
             {
                 query = query.Where(l => l.Description.ToLower().Contains(q.ToLower()));
@@ -175,22 +265,25 @@ namespace MediScope.Controllers
                 .ToListAsync();
 
             ViewData["Take"] = take;
+
             return View("Logs", logs);
         }
 
+        /// <summary>
+        /// Omrahn - Clears all logs and records the action for audit.
+        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ClearLogs()
         {
-            // capture a note for audit
             var admin = User?.Identity?.Name ?? "Admin";
+
             _context.Logs.RemoveRange(_context.Logs);
             await _context.SaveChangesAsync();
-            
+
             await _logging.AddAsync($"Admin '{admin}' cleared all logs");
 
             return RedirectToAction("Logs");
         }
     }
 }
-
