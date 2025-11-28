@@ -1,3 +1,14 @@
+/**************************************************************************
+ * File: TestResult.cs
+ * Author: Omrahn Faqiri
+ *
+ * Description:
+ *     Represents a medical test result associated with patients and doctors.
+ *     Includes relationships to Patient, Doctor, and optionally Appointment.
+ *     
+ *
+ * Last Modified: Nov 27, 2025
+ **************************************************************************/
 namespace MediScope.Models;
 
 public class TestResult

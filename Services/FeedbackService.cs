@@ -1,6 +1,6 @@
 /**************************************************************************
  * File: FeedbackService.cs
- * Author: Imrahn (structure) with expansion by Maryam Elhamidi
+ * Author: Omrahn (structure) with expansion by Maryam Elhamidi
  *
  * Description:
  *     Provides core operations for patient feedback creation and retrieval.

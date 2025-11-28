@@ -1,3 +1,29 @@
+/**************************************************************************
+ * File: PatientController.cs
+ * Authors:
+ *     • Omrahn Faqiri  — Implemented Feedback and test result viewing + functionality
+ *
+ *     • Maryam Elhamidi — Added Service integration, Appointment listing
+ *
+ * Description:
+ *     This controller provides all patient-facing functionality in MediScope:
+ *         - Patient dashboard showing upcoming & past appointments
+ *         - Submitting feedback for doctors
+ *         - Viewing and downloading test results
+ *         - Proper validation and error handling
+ *         - Secure access to patient-specific data
+ *
+ *     This controller enforces:
+ *         - Role-based access ("Patient" only)
+ *         - Linking patients to Identity users
+ *         - Proper audit logging for every sensitive operation
+ *         - Input validation for feedback submissions
+ *         - Prevention of duplicate feedback entries
+ *         - Secure file generation and download for test results
+ *
+ * Last Modified: Nov 26, 2025
+ **************************************************************************/
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MediScope.Services;
@@ -46,6 +72,8 @@ namespace MediScope.Controllers
             return View();
         }
 
+        // Handles patient feedback submission for doctors.
+        // Validates input, prevents duplicate feedback, and logs the action.
         [HttpPost]
         public async Task<IActionResult> Feedback(int doctorId, int rating, string message)
         {
@@ -106,6 +134,10 @@ namespace MediScope.Controllers
             return RedirectToAction("Feedback");
         }
 
+        // This action lists all test results for the logged-in patient.
+        // It ensures the patient is authenticated and retrieves their test results.
+        // Results are ordered by date performed, most recent first.
+        // Each result includes associated doctor information.
         [HttpGet]
         public async Task<IActionResult> TestResults()
         {
@@ -122,6 +154,8 @@ namespace MediScope.Controllers
             return View(results);
         }
 
+        // This action displays detailed information about a specific test result.
+        // It verifies that the test result belongs to the logged-in patient.
         [HttpGet]
         public async Task<IActionResult> TestResult(int id)
         {
@@ -143,6 +177,8 @@ namespace MediScope.Controllers
             return View("TestResult", result);
         }
 
+        // This action allows the patient to download a text file of a specific test result.
+        // It ensures the test result belongs to the logged-in patient and generates a formatted text file.
         [HttpGet]
         public async Task<IActionResult> DownloadTestResult(int id)
         {

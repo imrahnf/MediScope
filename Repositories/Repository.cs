@@ -1,3 +1,16 @@
+/**************************************************************************
+ * File: Repository.cs
+ * Author: Omrahn Faqiri
+ *
+ * Description:
+ *     This class implements a generic repository pattern for managing entities
+ *     in the MediScope application. It provides concrete implementations for common
+ *     data operations such as retrieving all entities, getting an entity by its ID,
+ *     adding a new entity, deleting an entity, and saving changes to the data store.
+ *
+ * Last Modified: Nov 27, 2025
+ **************************************************************************/
+
 using MediScope.Models;
 using Microsoft.EntityFrameworkCore;
 

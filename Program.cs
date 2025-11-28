@@ -84,7 +84,7 @@ using (var scope = app.Services.CreateScope())
     // apply migrations
     context.Database.Migrate();
     
-    // seed data
+    // Optional: Seed initial data (uncomment if needed)
     // await SeedData.Initialize(services, context);
 }
 

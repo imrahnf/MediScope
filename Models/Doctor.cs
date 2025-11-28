@@ -1,3 +1,13 @@
+/**************************************************************************
+ * File: Doctor.cs
+ * Author: Omrahn Faqiri
+ *
+ * Description:
+ *     Represents a medical doctor in the MediScope system.
+ *     Doctors have specialties and can be linked to user accounts.
+ *
+ * Last Modified: Nov 27, 2025
+ **************************************************************************/
 using MediScope.Identity;
 
 namespace MediScope.Models;

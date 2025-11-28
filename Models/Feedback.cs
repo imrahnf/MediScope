@@ -1,3 +1,13 @@
+/**************************************************************************
+ * File: Feedback.cs
+ * Author: Omrahn Faqiri
+ *
+ * Description:
+ *      Represents feedback given by patients to doctors.
+
+ *
+ * Last Modified: Nov 27, 2025
+ **************************************************************************/
 namespace MediScope.Models;
 
 public class Feedback

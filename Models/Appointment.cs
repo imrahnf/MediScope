@@ -1,3 +1,13 @@
+/**************************************************************************
+ * File: Appointment.cs
+ * Author: Omrahn Faqiri
+ *
+ * Description:
+ *     Represents a medical appointment between a patient and a doctor.
+ *     Appointments have a date, status, and link to both patient and doctor.
+ *
+ * Last Modified: Nov 27, 2025
+ **************************************************************************/
 namespace MediScope.Models;
 
 public class Appointment

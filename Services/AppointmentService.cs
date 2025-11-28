@@ -1,6 +1,6 @@
 /**************************************************************************
  * File: AppointmentService.cs
- * Author: Imrahn (Core logic), with integration scripting by Maryam Elhamidi
+ * Author: Omrahn (Core logic), with integration scripting by Maryam Elhamidi
  *
  * Description:
  *     Contains all business logic related to appointments: booking,
