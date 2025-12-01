@@ -7,15 +7,15 @@
 ---
 
 ## Table of Contents
-- [MediScope](#mediscope-)
-  - [Table of Contents](#-table-of-contents)
-  - [Overview](#-overview)
+- [MediScope 🏥](#mediscope-)
+  - [Table of Contents](#table-of-contents)
+  - [Overview](#overview)
   - [Features](#features)
     - [Administrators](#administrators)
     - [Doctors](#doctors)
     - [Patients](#patients)
     - [Core System Features](#core-system-features)
-  - [Technology Stack](#-technology-stack)
+  - [🛠 Technology Stack](#-technology-stack)
     - [Backend](#backend)
     - [Frontend](#frontend)
     - [Architecture Patterns](#architecture-patterns)
@@ -62,6 +62,8 @@ The system implements role-based access control with three distinct user types (
 - **Feedback Management**: Review and respond to patient feedback
 - **Analytics API**: Access detailed analytics data via REST endpoints
 
+![Admin Analytics Dashboard](/docs/screenshots/admin-analytics-dashboard.png)
+
 ### Doctors
 - **Appointment Management**: View and manage scheduled appointments
 - **Patient Records**: Access and upload medical reports
@@ -69,11 +71,15 @@ The system implements role-based access control with three distinct user types (
 - **Department Association**: Linked to specific medical departments
 - **Schedule Management**: Track daily appointments and availability
 
+![Doctor Dashboard](/docs/screenshots/doctor-view.png)
+
 ### Patients
 - **Book Appointments**: Schedule appointments with available doctors
 - **View Medical History**: Access and download personal test results and records
 - **Appointment Tracking**: Monitor upcoming and past appointments
 - **Feedback System**: Provide feedback on services and care
+
+![Patient Booking](/docs/screenshots/appointment-booking.png)
 
 ### Core System Features
 - **Secure Authentication**: ASP\.NET Core Identity with role-based authorization
@@ -82,6 +88,8 @@ The system implements role-based access control with three distinct user types (
 - **Data Validation**: Robust nput validation service
 - **Logging System**: Track all critical system operations
 - **Database Migrations**: Schema updates via EF Core
+
+![Login](/docs/screenshots/login.png)
 
 ---
 
