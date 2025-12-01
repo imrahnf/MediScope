@@ -85,7 +85,7 @@ The system implements role-based access control with three distinct user types (
 
 ---
 
-## 🛠 Technology Stack
+## Tech Stack
 
 ### Backend
 - **Framework**: ASP.NET Core 8.0 (MVC)
